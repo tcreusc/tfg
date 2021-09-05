@@ -1,5 +1,8 @@
 classdef AnalysisPerformer < handle
 
+    % eliminar Test, fusionar amb AnalysisPerformer -> Analysis
+    % simplificar stiffnessBlaBla
+    
     properties(SetAccess = private, GetAccess = public)
         
     end
@@ -18,7 +21,8 @@ classdef AnalysisPerformer < handle
             obj.materialDataFile  = varMaterialData;
             obj.geometricDataFile = varGeometricData;
             obj.boundaryDataFile  = varBoundaryData;
-            obj.performAnalysis();
+            
+            obj.init(cParams);
         end
 
         function [u] = getDisplacements(obj)
@@ -30,6 +34,14 @@ classdef AnalysisPerformer < handle
             %create
             %bla 
         end
+        
+        function perform(obj)
+            obj.connectDOFs();
+            obj.computeStiffnessMatrix();
+            obj.splitDOFs();
+            obj.solveSystem();
+            obj.computeInternal();
+        end       
         
     end
     
@@ -74,6 +86,7 @@ classdef AnalysisPerformer < handle
             s = 1; 
             Kcomputer = GlobalStiffnessMatrixComputer(s);
             obj.K = Kcomputer.compute();
+            
             [Kel] = GlobalStiffnessMatrixComputer(dim,x,Tn,mat,Tmat).getMatrix();
         end
         
