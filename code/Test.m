@@ -19,7 +19,10 @@ classdef Test < handle
             obj.materialData = materialData;
             obj.geometricData = geometricData;
             obj.boundaryData = boundaryData;
+            
+            obj.loadData();
             obj.computeAnalysis();
+            obj.checkTest();
             
 %             if (obj.desplacaments == performAnalysis)
 %                 obj.status = 1;
@@ -31,12 +34,21 @@ classdef Test < handle
         function getStatus()
         end
     end
-    methods(Access = private)        
+    methods(Access = private)    
+        function loadData(obj)
+            
+        end
+        
         function computeAnalysis(obj)
             analysis = AnalysisPerformer(obj.materialData, obj.geometricData, obj.boundaryData);
             obj.desplacaments = analysis.getDisplacements();
+            display(obj.desplacaments)
         end
-        %function checkTest
+        
+        function checkTest(obj)
+            
+        end
+       
         
     end
 end

@@ -6,10 +6,7 @@ classdef AnalysisPerformer < handle
     
     properties(Access = private)
         materialDataFile
-        geometricDataFile
-        boundaryDataFile
-        u
-        dim
+        geometricDataFile, boundaryDataFile, u, dim
     end
     
     methods(Access = public)
@@ -26,7 +23,8 @@ classdef AnalysisPerformer < handle
         end
         
         function createAnalysis(obj)
-            %loadData
+            %load
+            %setDimensions
             %create
             %bla 
         end
@@ -70,7 +68,7 @@ classdef AnalysisPerformer < handle
 %             display(Mz)
         end
         
-        function Kel = computeStiffnessMatrix(obj)
+        function computeStiffnessMatrix(obj)
             s = 1; 
             Kcomputer = GlobalStiffnessMatrixComputer(s);
             obj.K = Kcomputer.compute();
@@ -82,18 +80,10 @@ classdef AnalysisPerformer < handle
             
         end
         
-        % -----
-        
-        function dim = setDimensions(obj)
-            dim.nd = size(x,2);   % Problem dimension
-            dim.nel = size(Tn,1); % Number of elements (bars)
-            dim.nnod = size(x,1); % Number of nodes (joints)
-            dim.nne = size(Tn,2); % Number of nodes in a bar
-            dim.ni = 3;           % Degrees of freedom per node
-            dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
+        function splitDOFs(obj)
+            s = 
             
         end
-       
     end
 end
 

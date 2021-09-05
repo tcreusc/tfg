@@ -1,6 +1,7 @@
 %% Funció solveSystem(KG,Fext,ur,vr,vl)
 % Soluciona el sistema, i retorna una matriu amb el desplacament de cada
 % DOF, i una matriu amb les forces de reaccio
+
 classdef ForceSystemSolver < handle
 
     properties(SetAccess = private, GetAccess = public)
@@ -30,7 +31,7 @@ classdef ForceSystemSolver < handle
         
         function calculateSystemSolution(obj)
             [LHS,RHS] = obj.sistema.getLHSRHS();
-            solver = IterativeSolver(LHS, RHS); 
+            solver = IterativeSolver(LHS, RHS); % fer-ho amb Solver, dispatching
             obj.ul = solver.solucio;
         end
         

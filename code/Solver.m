@@ -21,5 +21,10 @@ classdef (Abstract) Solver < handle
             % A definir per cadascun dels solvers
         end
     end
+    
+    % funcio estatica create
+    % switch cparams.type
+    % case 'iterative'
+    %
 end
 

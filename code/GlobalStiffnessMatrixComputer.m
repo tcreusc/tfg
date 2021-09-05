@@ -29,9 +29,9 @@ classdef GlobalStiffnessMatrixComputer < handle
             
             vKel = zeros(dim.nne*dim.ni,dim.nne*dim.ni,dim.nel);
                 for e = 1:dim.nel
-                    stiffnessElement  = stiffnessElementCalculator(x,Tn,e);
+                    stiffnessElement  = stiffnessElementCalculator(x,Tn,e); % simplificar noms, scope ja es petit
                     stiffnessMaterial = stiffnessMaterialData(mat,Tmat,e);    
-                    Ke = stiffnessLocalMatrixCalculator(stiffnessElement, stiffnessMaterial).Ke;
+                    Ke = stiffnessLocalMatrixCalculator(stiffnessElement, stiffnessMaterial).Ke; % fer-ho com a AnalysisPerf
 
                     for r =1:dim.nne*dim.ni
                         for s = 1:dim.nne*dim.ni
@@ -44,9 +44,4 @@ classdef GlobalStiffnessMatrixComputer < handle
         end
                 
     end
-end
-
-function [Kel, leng] = stiffnessBars(dim,x,Tn,mat,Tmat)
-
-
 end
