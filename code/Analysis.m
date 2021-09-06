@@ -1,6 +1,6 @@
-classdef AnalysisPerformer < handle
+classdef Analysis < handle
 
-    % eliminar Test, fusionar amb AnalysisPerformer -> Analysis
+    % eliminar Test, fusionar amb Analysis -> Analysis
     % simplificar stiffnessBlaBla
     
     properties(SetAccess = private, GetAccess = public)
@@ -17,7 +17,7 @@ classdef AnalysisPerformer < handle
     
     methods(Access = public)
         
-        function obj = AnalysisPerformer(varMaterialData, varGeometricData, varBoundaryData)
+        function obj = Analysis(varMaterialData, varGeometricData, varBoundaryData)
             obj.materialDataFile  = varMaterialData;
             obj.geometricDataFile = varGeometricData;
             obj.boundaryDataFile  = varBoundaryData;
@@ -41,6 +41,7 @@ classdef AnalysisPerformer < handle
             obj.splitDOFs();
             obj.solveSystem();
             obj.computeInternal();
+            obj.checkAnalysis();
         end       
         
     end
