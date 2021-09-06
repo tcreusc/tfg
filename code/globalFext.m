@@ -1,6 +1,4 @@
-%% Funció globalFext(dim,fdata)
-% A partir de les dades introduides per la forca externa, retorna la matriu
-% global de forces externes
+% deprecated
 
 function Fext = globalFext(dim,fdata)
 

@@ -11,6 +11,12 @@ classdef Analysis < handle
         materialDataFile
         geometricDataFile
         boundaryDataFile
+        cParams
+        Td
+        K
+        ur
+        vr
+        ul
         u
         dim
     end
@@ -49,7 +55,7 @@ classdef Analysis < handle
     methods(Access = private)   
         
         function init(obj, cParams)
-            
+            obj.cParams = cParams;
         end
         
         function performAnalysis(obj) % 
@@ -71,7 +77,7 @@ classdef Analysis < handle
             
             %% Solver
 
-            Td = connectDOF(dim,Tn);
+%             Td = connectDOF(dim,Tn);
             myglobalFext = globalFext(dim,fdata);
             [Fext,KG] = assemblyK(dim,Kel,Td,myglobalFext);
             [ur,vr,vl] = DOFFixer(dim,fixnod).getDisplacementsAndDOFs();
@@ -83,31 +89,44 @@ classdef Analysis < handle
 %             display(Mz)
         end
         
+        function connectDOFs(obj, dim, Tn)
+            
+            vTd = zeros(dim.nel,dim.nne*dim.ni);
+            
+            for e = 1:dim.nel
+                for i = 1:dim.nne
+                    for j = 1:dim.ni
+                        I = dim.ni*(i-1)+j;
+                        vTd(e,I) = dim.ni*(Tn(e,i)-1)+j;
+                    end
+                end
+            end
+            
+            obj.Td = vTd;
+            
+        end
+        
         function Kel = computeStiffnessMatrix(obj)
             s = 1; 
-            Kcomputer = GlobalStiffnessMatrixComputer(s);
+            Kcomputer = GlobalStiffnessMatrix(s);
             obj.K = Kcomputer.compute();
             
-            [Kel] = GlobalStiffnessMatrixComputer(dim,x,Tn,mat,Tmat).getMatrix();
         end
         
         function splitDOFs(obj)
-            s = 
-            
+            s = 1;
+            DOFfixer = DOFFixer(dim,fixnod);
+            [ur,vr,vl] = DOFfixer.getDisplacementsAndDOFs();
+        end
+               
+        function solveSystem(obj)
         end
         
-        % -----
-        
-        function dim = setDimensions(obj)
-            dim.nd = size(x,2);   % Problem dimension
-            dim.nel = size(Tn,1); % Number of elements (bars)
-            dim.nnod = size(x,1); % Number of nodes (joints)
-            dim.nne = size(Tn,2); % Number of nodes in a bar
-            dim.ni = 3;           % Degrees of freedom per node
-            dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
-            
+        function computeInternal(obj)
         end
-       
+        
+        function checkAnalysis(obj)
+        end
     end
 end
 
