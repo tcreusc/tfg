@@ -43,7 +43,7 @@ L4 = 2.5; % m
 L5 = 4.2; % m
 
 % Nodal coordinates
-x = [
+data.x = [
       0,          H1; % Node 1
       0,       H1+H2; % Node 2
       0,    H1+H2+H3; % Node 3
@@ -52,7 +52,7 @@ x = [
 ];
 
 % Nodal connectivities  
-Tn = [
+data.Tn = [
     1, 2; % Element 1-2
     2, 3; % Element 2-3
     3, 4; % Element 3-4
@@ -60,13 +60,13 @@ Tn = [
 ];
 
 % Material properties matrix
-mat = [
+data.mat = [
                E,               AA,        IzA;  % Material 1
                E,               AB,        IzB;  % Material 2
 ];
 
 % Material connectivities
-Tmat = [
+data.Tmat = [
     1; % Element 1-2 / Material 1 (A)
     1; % Element 2-3 / Material 1 (A)
     1; % Element 3-4 / Material 1 (A)
@@ -80,19 +80,19 @@ Pmax = 5.8054e+05;
 F1 =  -3.0527e+05;
 
 % Cas 1 - Immediately before 1-6 breaks
-fdata = [
+data.fdata = [
     1, 1, F1;
     2, 1, Pmax/2;
     ];
 
 % Cas 2 - After 1-6 breaks
-fdata = [
+data.fdata = [
     1, 1, 0;
     2, 1, Pmax;
     ];
 
 %Forces i nodes fixats
-fixnod = [
+data.fixnod = [
     4, 1, 0;
     4, 2, 0;
     4, 3, 0; % s'han d'imposar els tres DOFs...
@@ -104,10 +104,10 @@ fixnod = [
 %% Dimensions
 
 %Dimensions
-dim.nd = size(x,2);   % Problem dimension
-dim.nel = size(Tn,1); % Number of elements (bars)
-dim.nnod = size(x,1); % Number of nodes (joints)
-dim.nne = size(Tn,2); % Number of nodes in a bar
+dim.nd = size(data.x,2);   % Problem dimension
+dim.nel = size(data.Tn,1); % Number of elements (bars)
+dim.nnod = size(data.x,1); % Number of nodes (joints)
+dim.nne = size(data.Tn,2); % Number of nodes in a bar
 dim.ni = 3;           % Degrees of freedom per node
 dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
 

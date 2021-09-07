@@ -10,25 +10,29 @@ classdef DOFFixer < handle
     end
     
     properties(Access = private)
-        
+        dim
+        fixnod
     end
     
     methods(Access = public)
         
-        function obj = DOFFixer(dim,fixnod)
-            obj.calculateFixedData(fixnod);
-            obj.calculateFreeDOFs(dim);
+        function obj = DOFFixer(cParams)
+            obj.init(cParams);
         end
-
-        function [ur,vr,vl] = getDisplacementsAndDOFs(obj)
-            ur = obj.ur;
-            vr = obj.vr;
-            vl = obj.vl;
+        
+        function obj = fix(obj)
+            obj.calculateFixedData(obj.fixnod);
+            obj.calculateFreeDOFs(obj.dim);
         end
         
     end
     
     methods(Access = private)   
+        
+        function init(obj, cParams)
+            obj.dim = cParams.dim;
+            obj.fixnod = cParams.data.fixnod;
+        end
         
         function calculateFixedData(obj, fixnod)
             varvr = zeros(height(fixnod), 1);

@@ -5,26 +5,27 @@
 classdef GlobalStiffnessMatrix < handle
 
     properties(SetAccess = private, GetAccess = public)
-        K
+        KG
         Fext
         leng
+        Kel
     end
     
     properties(Access = private)
         dim
+        data
         x
         Tn
         mat
         Tmat
         Td
         fdata
-        Kel
     end
     
     methods(Access = public)
         
-        function obj = GlobalStiffnessMatrix(dim,x,Tn,mat,Tmat, fdata, Td)
-            obj.init(dim,x,Tn,mat,Tmat, fdata, Td);
+        function obj = GlobalStiffnessMatrix(cParams)
+            obj.init(cParams);
         end
                 
         function obj = compute(obj)
@@ -37,14 +38,14 @@ classdef GlobalStiffnessMatrix < handle
     
     methods(Access = private)   
         
-        function init(obj, dim,x,Tn,mat,Tmat, fdata, Td)
-            obj.dim = dim;
-            obj.x = x;
-            obj.Tn = Tn;
-            obj.mat = mat;
-            obj.Tmat = Tmat;
-            obj.Td = Td;
-            obj.fdata = fdata;
+        function init(obj, cParams)
+            obj.dim = cParams.dim;
+            obj.x = cParams.data.x;
+            obj.Tn = cParams.data.Tn;
+            obj.mat = cParams.data.mat;
+            obj.Tmat = cParams.data.Tmat;
+            obj.fdata = cParams.data.fdata;
+            obj.Td = cParams.Td;
         end
         
         function createLocalStiffnessBars(obj)
@@ -79,7 +80,7 @@ classdef GlobalStiffnessMatrix < handle
                 end
             end
             
-            obj.K = KG;
+            obj.KG = KG;
 
         end
         

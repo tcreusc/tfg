@@ -4,44 +4,32 @@ classdef Analysis < handle
     % simplificar stiffnessBlaBla
     
     properties(SetAccess = private, GetAccess = public)
-        
+        status
     end
     
     properties(Access = private)
-        materialDataFile
-        geometricDataFile
-        boundaryDataFile
-        cParams
+        dataFile
+        data
         Td
-        K
-        ur
-        vr
-        ul
-        u
+        Kel, KG, Fext
+        ur, vr, vl, u
+        Fx, Fy, Mz
+        R
         dim
     end
     
     methods(Access = public)
         
-        function obj = Analysis(varMaterialData, varGeometricData, varBoundaryData)
-            obj.materialDataFile  = varMaterialData;
-            obj.geometricDataFile = varGeometricData;
-            obj.boundaryDataFile  = varBoundaryData;
-            
-            obj.init(cParams);
+        function obj = Analysis(dataFile)
+            obj.dataFile  = dataFile;
+            obj.init();
         end
 
         function [u] = getDisplacements(obj)
             u = obj.u;
         end
-        
-        function createAnalysis(obj)
-            %loadData
-            %create
-            %bla 
-        end
-        
-        function perform(obj)
+                
+        function obj = perform(obj)
             obj.connectDOFs();
             obj.computeStiffnessMatrix();
             obj.splitDOFs();
@@ -54,50 +42,21 @@ classdef Analysis < handle
     
     methods(Access = private)   
         
-        function init(obj, cParams)
-            obj.cParams = cParams;
+        function init(obj)
+            run(obj.dataFile)
+            obj.data = data;
+            obj.dim = dim;
         end
-        
-        function performAnalysis(obj) % 
-            run(obj.materialDataFile);
-            run(obj.geometricDataFile);
-            run(obj.boundaryDataFile);
+                
+        function connectDOFs(obj)
             
-            % ^ loadParams
-
-            %Dimensions
-            dim.nd = size(x,2);   % Problem dimension
-            dim.nel = size(Tn,1); % Number of elements (bars)
-            dim.nnod = size(x,1); % Number of nodes (joints)
-            dim.nne = size(Tn,2); % Number of nodes in a bar
-            dim.ni = 3;           % Degrees of freedom per node
-            dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
+            vTd = zeros(obj.dim.nel,obj.dim.nne*obj.dim.ni);
             
-            % obj.createDims
-            
-            %% Solver
-
-%             Td = connectDOF(dim,Tn);
-            myglobalFext = globalFext(dim,fdata);
-            [Fext,KG] = assemblyK(dim,Kel,Td,myglobalFext);
-            [ur,vr,vl] = DOFFixer(dim,fixnod).getDisplacementsAndDOFs();
-            [obj.u, R] = ForceSystemSolver(KG,Fext,ur,vr,vl).getDisplacementAndReactions();
-            [Fx, Fy, Mz] = InternalForcesComputer(dim,obj.u,x,Tn,Td,Kel, mat, Tmat).getForces();
-
-%             display(Fx)
-%             display(Fy)
-%             display(Mz)
-        end
-        
-        function connectDOFs(obj, dim, Tn)
-            
-            vTd = zeros(dim.nel,dim.nne*dim.ni);
-            
-            for e = 1:dim.nel
-                for i = 1:dim.nne
-                    for j = 1:dim.ni
-                        I = dim.ni*(i-1)+j;
-                        vTd(e,I) = dim.ni*(Tn(e,i)-1)+j;
+            for e = 1:obj.dim.nel
+                for i = 1:obj.dim.nne
+                    for j = 1:obj.dim.ni
+                        I = obj.dim.ni*(i-1)+j;
+                        vTd(e,I) = obj.dim.ni*(obj.data.Tn(e,i)-1)+j;
                     end
                 end
             end
@@ -106,26 +65,45 @@ classdef Analysis < handle
             
         end
         
-        function Kel = computeStiffnessMatrix(obj)
-            s = 1; 
+        function computeStiffnessMatrix(obj)
+            s.dim = obj.dim;
+            s.data = obj.data;
+            s.Td = obj.Td;
             Kcomputer = GlobalStiffnessMatrix(s);
-            obj.K = Kcomputer.compute();
+            Kcomputer.compute();
+            obj.Kel = Kcomputer.Kel;
+            obj.KG = Kcomputer.KG;
+            obj.Fext = Kcomputer.Fext;
             
         end
         
         function splitDOFs(obj)
-            s = 1;
-            DOFfixer = DOFFixer(dim,fixnod);
-            [ur,vr,vl] = DOFfixer.getDisplacementsAndDOFs();
+            s.dim = obj.dim;
+            s.data.fixnod = obj.data.fixnod;
+            DOFfixer = DOFFixer(s);
+            DOFfixer.fix();
+            obj.ur = DOFfixer.ur;
+            obj.vr = DOFfixer.vr;
+            obj.vl = DOFfixer.vl;
         end
                
         function solveSystem(obj)
+            [obj.u, obj.R] = ForceSystemSolver(obj.KG,obj.Fext,obj.ur,obj.vr,obj.vl).getDisplacementAndReactions();
         end
         
         function computeInternal(obj)
+            [obj.Fx, obj.Fy, obj.Mz] = InternalForcesComputer(obj.dim,obj.u,x,Tn,Td,obj.Kel, mat, Tmat).getForces();
         end
         
         function checkAnalysis(obj)
+            passed = 1;
+            
+            if (passed)
+                fprintf('Test ') ; cprintf('-comment', 'passed') ; fprintf('!\n') ;
+            else
+                fprintf('Test ') ; cprintf('-err', 'failed') ; fprintf('!\n') ;
+            end
+            
         end
     end
 end
