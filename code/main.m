@@ -8,4 +8,4 @@ dataFile = fullfile(DFfilename, DFpathstr);
 
 analysis = Analysis(dataFile);
 analysis.perform();
-display(analysis.status)
+analysis.check();

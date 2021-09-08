@@ -9,37 +9,60 @@ classdef ForceSystemSolver < handle
     end
     
     properties(Access = private)
-        sistema, ul
+        sistema
+        KG
+        Fext
+        ur, vr, vl
+        ul
+        LHS, RHS
+        KRL, KRR, FRext
     end
     
     methods(Access = public)
         
-        function obj = ForceSystemSolver(KG,Fext,ur,vr,vl)
-            obj.sistema = ForceSystemLHSRHS(KG, ur, vl, vr, Fext);
-            obj.calculateSystemSolution();
-            obj.calculateDisplacementAndReactions(vr, vl, ur);
+        function obj = ForceSystemSolver(cParams)
+            obj.init(cParams);
         end
 
-        function [u, R] = getDisplacementAndReactions(obj)
-            u = obj.u;
-            R = obj.R;
+        function obj = solve(obj)
+            obj.calculateLHSRHS();
+            obj.calculateSystemSolution();
+            obj.calculateDisplacementAndReactions();    
         end
         
     end
     
     methods(Access = private)   
         
+        function init(obj, cParams)
+            obj.KG = cParams.KG;
+            obj.Fext = cParams.Fext;
+            obj.ur = cParams.ur;
+            obj.vr = cParams.vr;
+            obj.vl = cParams.vl;
+        end
+        
+        function calculateLHSRHS(obj)
+            KLL = obj.KG(obj.vl, obj.vl);
+            KLR = obj.KG(obj.vl, obj.vr);
+            FLext = obj.Fext(obj.vl,1);
+            obj.KRL = obj.KG(obj.vr, obj.vl);
+            obj.KRR = obj.KG(obj.vr, obj.vr);
+            obj.FRext = obj.Fext(obj.vr,1);
+            
+            obj.LHS = FLext - KLR*obj.ur;
+            obj.RHS = KLL;  
+        end
+        
         function calculateSystemSolution(obj)
-            [LHS,RHS] = obj.sistema.getLHSRHS();
-            solver = IterativeSolver(LHS, RHS); % fer-ho amb Solver, dispatching
+            solver = IterativeSolver(obj.LHS, obj.RHS); % fer-ho amb Solver, dispatching
             obj.ul = solver.solucio;
         end
         
-        function calculateDisplacementAndReactions(obj, vr, vl, ur)
-            [KRL, KRR, FRext] = obj.sistema.getDisplacementData();
-            obj.R = KRR * ur + KRL*obj.ul-FRext;
-            obj.u(vl,1) = obj.ul;
-            obj.u(vr,1) = ur;
+        function calculateDisplacementAndReactions(obj)
+            obj.R = obj.KRR * obj.ur + obj.KRL*obj.ul - obj.FRext;
+            obj.u(obj.vl,1) = obj.ul;
+            obj.u(obj.vr,1) = obj.ur;
         end
         
     end

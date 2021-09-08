@@ -17,7 +17,7 @@ classdef ForceSystemLHSRHS
             obj.FRext = Fext(vr,1);
             
             obj.LHS = FLext - KLR*ur;
-            obj.RHS = KLL;
+            obj.RHS = KLL;  
         end
         
         function [LHS,RHS] = getLHSRHS(obj)

@@ -1,10 +1,7 @@
 classdef Analysis < handle
-
-    % eliminar Test, fusionar amb Analysis -> Analysis
-    % simplificar stiffnessBlaBla
     
     properties(SetAccess = private, GetAccess = public)
-        status
+        passed
     end
     
     properties(Access = private)
@@ -35,9 +32,18 @@ classdef Analysis < handle
             obj.splitDOFs();
             obj.solveSystem();
             obj.computeInternal();
-            obj.checkAnalysis();
-        end       
+        end  
         
+        function check(obj)
+            obj.passed = 1;
+            
+            if (obj.passed)
+                fprintf('Test ') ; cprintf('-comment', 'passed') ; fprintf('!\n') ;
+            else
+                fprintf('Test ') ; cprintf('-err', 'failed') ; fprintf('!\n') ;
+            end
+            
+        end
     end
     
     methods(Access = private)   
@@ -88,23 +94,34 @@ classdef Analysis < handle
         end
                
         function solveSystem(obj)
-            [obj.u, obj.R] = ForceSystemSolver(obj.KG,obj.Fext,obj.ur,obj.vr,obj.vl).getDisplacementAndReactions();
+            s.KG = obj.KG;
+            s.Fext = obj.Fext;
+            s.ur = obj.ur;
+            s.vr = obj.vr;
+            s.vl = obj.vl;
+            
+            FSS = ForceSystemSolver(s);
+            FSS.solve();
+            
+            obj.u = FSS.u;
+            obj.R = FSS.R;
         end
         
         function computeInternal(obj)
-            [obj.Fx, obj.Fy, obj.Mz] = InternalForcesComputer(obj.dim,obj.u,x,Tn,Td,obj.Kel, mat, Tmat).getForces();
+            s.dim = obj.dim;
+            s.data = obj.data;
+            s.u = obj.u;
+            s.Td = obj.Td;
+            s.Kel = obj.Kel;
+            
+            IFC = InternalForcesComputer(s);
+            IFC.compute();
+            
+            obj.Fx = IFC.Fx;
+            obj.Fy = IFC.Fy;
+            obj.Mz = IFC.Mz;
         end
         
-        function checkAnalysis(obj)
-            passed = 1;
-            
-            if (passed)
-                fprintf('Test ') ; cprintf('-comment', 'passed') ; fprintf('!\n') ;
-            else
-                fprintf('Test ') ; cprintf('-err', 'failed') ; fprintf('!\n') ;
-            end
-            
-        end
     end
 end
 
