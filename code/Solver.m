@@ -1,30 +1,20 @@
 classdef (Abstract) Solver < handle
     
-    properties(SetAccess = protected, GetAccess = public)
-        solucio
-    end
-    
-    properties(Access = protected)
-        LHS, RHS
-    end
-    
-    methods(Access = public)
-        function obj = Solver(LHS,RHS)
-            obj.LHS = LHS;
-            obj.RHS = RHS;
-            obj.calculateSolution();
+    methods (Static)
+        
+        function stype = create(solver_type)
+                         
+            switch solver_type
+                case {'DIRECT'}
+                    stype = DirectSolver();
+                case {'ITERATIVE'}
+                    stype = IterativeSolver();
+                otherwise
+                    error('Invalid Solver Type.')
+            end
         end
+        
     end
     
-    methods(Access = protected)
-         function calculateSolution(obj)
-            % A definir per cadascun dels solvers
-        end
-    end
-    
-    % funcio estatica create
-    % switch cparams.type
-    % case 'iterative'
-    %
 end
 

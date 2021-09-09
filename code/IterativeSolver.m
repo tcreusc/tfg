@@ -1,8 +1,10 @@
 classdef IterativeSolver < Solver
-    methods(Access = protected)    
-        function calculateSolution(obj)
-            obj.solucio = pcg(obj.RHS,obj.LHS,[],1000);
+    
+    methods (Static)
+        function solucio = solve(RHS, LHS)
+            solucio = pcg(RHS,LHS,[],1000);
         end
     end
+    
 end
 

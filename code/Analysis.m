@@ -7,6 +7,8 @@ classdef Analysis < handle
     properties(Access = private)
         dataFile
         data
+        solvertype
+        results
         Td
         Kel, KG, Fext
         ur, vr, vl, u
@@ -35,13 +37,16 @@ classdef Analysis < handle
         end  
         
         function check(obj)
-            obj.passed = 1;
+            tolerance = 1e15*eps(min(abs(obj.results),abs(obj.u)));
             
-            if (obj.passed)
+            if abs(obj.results-obj.u) < tolerance
+                obj.passed = 1;
                 fprintf('Test ') ; cprintf('-comment', 'passed') ; fprintf('!\n') ;
             else
+                obj.passed = 0;
                 fprintf('Test ') ; cprintf('-err', 'failed') ; fprintf('!\n') ;
-            end
+                
+            end     
             
         end
     end
@@ -52,6 +57,8 @@ classdef Analysis < handle
             run(obj.dataFile)
             obj.data = data;
             obj.dim = dim;
+            obj.solvertype = solvertype;
+            obj.results = results;
         end
                 
         function connectDOFs(obj)
@@ -99,6 +106,7 @@ classdef Analysis < handle
             s.ur = obj.ur;
             s.vr = obj.vr;
             s.vl = obj.vl;
+            s.solvertype = obj.solvertype;
             
             FSS = ForceSystemSolver(s);
             FSS.solve();

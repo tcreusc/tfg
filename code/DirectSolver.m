@@ -1,7 +1,8 @@
 classdef DirectSolver < Solver
-    methods(Access = protected)    
-        function calculateSolution(obj)
-            obj.solucio = obj.RHS \ obj.LHS;
+    
+    methods (Static)
+        function solucio = solve(RHS, LHS)
+            solucio = RHS \ LHS;
         end
     end
 end

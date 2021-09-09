@@ -101,9 +101,8 @@ data.fixnod = [
     5, 3, 0; % s'han d'imposar els tres DOFs...
     ];
 
-%% Dimensions
-
-%Dimensions
+%% Problem data
+% Dimensions
 dim.nd = size(data.x,2);   % Problem dimension
 dim.nel = size(data.Tn,1); % Number of elements (bars)
 dim.nnod = size(data.x,1); % Number of nodes (joints)
@@ -111,3 +110,9 @@ dim.nne = size(data.Tn,2); % Number of nodes in a bar
 dim.ni = 3;           % Degrees of freedom per node
 dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
 
+% Solver to use
+solvertype = 'DIRECT';
+
+% Expected results
+results = [0.3591; 0.0024; 0.4474; 0.1980; 0.0024; 0.4474; 0.0242; 0.0024; 0.1917; 0; 0; 0; 0; 0; 0];
+% results = [0.359082238819108;0.00237759060308813;0.447441449389525;0.198003317038879;0.00237759060308813;0.447441449389524;0.0241548862050407;0.00237759060308813;0.191669793932445;0;0;0;0;0;0];

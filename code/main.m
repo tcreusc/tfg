@@ -3,9 +3,10 @@
 
 clc; clear;
 
-[DFpathstr, DFfilename] = uigetfile('Data file');
-dataFile = fullfile(DFfilename, DFpathstr);
+% [DFpathstr, DFfilename] = uigetfile('Data file');
+% dataFile = fullfile(DFfilename, DFpathstr);
 
+dataFile = 'dades.m';
 analysis = Analysis(dataFile);
 analysis.perform();
 analysis.check();

@@ -9,7 +9,7 @@ classdef ForceSystemSolver < handle
     end
     
     properties(Access = private)
-        sistema
+        solvertype
         KG
         Fext
         ur, vr, vl
@@ -40,6 +40,7 @@ classdef ForceSystemSolver < handle
             obj.ur = cParams.ur;
             obj.vr = cParams.vr;
             obj.vl = cParams.vl;
+            obj.solvertype = cParams.solvertype;
         end
         
         function calculateLHSRHS(obj)
@@ -55,8 +56,11 @@ classdef ForceSystemSolver < handle
         end
         
         function calculateSystemSolution(obj)
-            solver = IterativeSolver(obj.LHS, obj.RHS); % fer-ho amb Solver, dispatching
-            obj.ul = solver.solucio;
+            
+            solver = Solver.create(obj.solvertype);
+            solution = solver.solve(obj.RHS, obj.LHS);
+            obj.ul = solution;
+            
         end
         
         function calculateDisplacementAndReactions(obj)
