@@ -29,11 +29,11 @@ classdef Analysis < handle
         end
                 
         function obj = perform(obj)
-            obj.connectDOFs();
+            obj.connectDOFs(); %computeMesh/Connectivity
             obj.computeStiffnessMatrix();
             obj.splitDOFs();
-            obj.solveSystem();
-            obj.computeInternal();
+            obj.solveSystem(); %computeDisplacements
+            obj.computeInternal(); %computeStress
         end  
         
         function check(obj)
@@ -62,9 +62,8 @@ classdef Analysis < handle
         end
                 
         function connectDOFs(obj)
-            
+            %computeConnectivityMatr
             vTd = zeros(obj.dim.nel,obj.dim.nne*obj.dim.ni);
-            
             for e = 1:obj.dim.nel
                 for i = 1:obj.dim.nne
                     for j = 1:obj.dim.ni
@@ -73,24 +72,21 @@ classdef Analysis < handle
                     end
                 end
             end
-            
             obj.Td = vTd;
-            
         end
         
         function computeStiffnessMatrix(obj)
             s.dim = obj.dim;
             s.data = obj.data;
             s.Td = obj.Td;
-            Kcomputer = GlobalStiffnessMatrix(s);
+            Kcomputer = GlobalStiffnessMatrix(s); %GSMComputer
             Kcomputer.compute();
-            obj.Kel = Kcomputer.Kel;
-            obj.KG = Kcomputer.KG;
-            obj.Fext = Kcomputer.Fext;
-            
+            obj.Kel = Kcomputer.Kel; %KElem
+            obj.KG = Kcomputer.KG; %KGlobal
+            obj.Fext = Kcomputer.Fext; % fora d'aqui, no hi ha cohesio
         end
         
-        function splitDOFs(obj)
+        function splitDOFs(obj) % fusionar-ho amb solvesyst i reanoenar
             s.dim = obj.dim;
             s.data.fixnod = obj.data.fixnod;
             DOFfixer = DOFFixer(s);
@@ -107,10 +103,8 @@ classdef Analysis < handle
             s.vr = obj.vr;
             s.vl = obj.vl;
             s.solvertype = obj.solvertype;
-            
             FSS = ForceSystemSolver(s);
             FSS.solve();
-            
             obj.u = FSS.u;
             obj.R = FSS.R;
         end
@@ -121,10 +115,8 @@ classdef Analysis < handle
             s.u = obj.u;
             s.Td = obj.Td;
             s.Kel = obj.Kel;
-            
             IFC = InternalForcesComputer(s);
             IFC.compute();
-            
             obj.Fx = IFC.Fx;
             obj.Fy = IFC.Fy;
             obj.Mz = IFC.Mz;

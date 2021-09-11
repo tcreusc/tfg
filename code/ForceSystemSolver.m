@@ -4,6 +4,8 @@
 
 classdef ForceSystemSolver < handle
 
+    % ForcesComputer
+    %DisplacementComputer
     properties(SetAccess = private, GetAccess = public)
         u, R
     end
@@ -29,7 +31,6 @@ classdef ForceSystemSolver < handle
             obj.calculateSystemSolution();
             obj.calculateDisplacementAndReactions();    
         end
-        
     end
     
     methods(Access = private)   
@@ -46,21 +47,18 @@ classdef ForceSystemSolver < handle
         function calculateLHSRHS(obj)
             KLL = obj.KG(obj.vl, obj.vl);
             KLR = obj.KG(obj.vl, obj.vr);
-            FLext = obj.Fext(obj.vl,1);
-            obj.KRL = obj.KG(obj.vr, obj.vl);
-            obj.KRR = obj.KG(obj.vr, obj.vr);
-            obj.FRext = obj.Fext(obj.vr,1);
-            
+            FLext = obj.Fext(obj.vl,1);        
             obj.LHS = FLext - KLR*obj.ur;
-            obj.RHS = KLL;  
+            obj.RHS = KLL;
+            obj.KRL = obj.KG(obj.vr, obj.vl); % es pot moure a sota
+            obj.KRR = obj.KG(obj.vr, obj.vr);
+            obj.FRext = obj.Fext(obj.vr,1);            
         end
         
         function calculateSystemSolution(obj)
-            
             solver = Solver.create(obj.solvertype);
             solution = solver.solve(obj.RHS, obj.LHS);
             obj.ul = solution;
-            
         end
         
         function calculateDisplacementAndReactions(obj)

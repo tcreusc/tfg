@@ -1,9 +1,6 @@
 classdef (Abstract) Solver < handle
-    
     methods (Static)
-        
-        function stype = create(solver_type)
-                         
+        function stype = create(solver_type)    
             switch solver_type
                 case {'DIRECT'}
                     stype = DirectSolver();
@@ -13,8 +10,6 @@ classdef (Abstract) Solver < handle
                     error('Invalid Solver Type.')
             end
         end
-        
     end
-    
 end
 

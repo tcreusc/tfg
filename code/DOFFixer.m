@@ -15,7 +15,6 @@ classdef DOFFixer < handle
     end
     
     methods(Access = public)
-        
         function obj = DOFFixer(cParams)
             obj.init(cParams);
         end
@@ -24,11 +23,9 @@ classdef DOFFixer < handle
             obj.calculateFixedData(obj.fixnod);
             obj.calculateFreeDOFs(obj.dim);
         end
-        
     end
     
-    methods(Access = private)   
-        
+    methods(Access = private)
         function init(obj, cParams)
             obj.dim = cParams.dim;
             obj.fixnod = cParams.data.fixnod;
@@ -37,28 +34,23 @@ classdef DOFFixer < handle
         function calculateFixedData(obj, fixnod)
             varvr = zeros(height(fixnod), 1);
             varur = zeros(height(fixnod), 1);
-
             for j = 1:height(fixnod)
                varvr(j) = nod3dof (fixnod(j,1),fixnod(j,2));
                varur(j) = fixnod(j,3);
             end
-            
             obj.vr = varvr;
             obj.ur = varur;
         end
         
         function calculateFreeDOFs(obj, dim)
             count = 1;
-
             for dof = 1:dim.ndof
                 if ~ismember(dof, obj.vr)
                     varvl(count) = dof;
                     count = count+1;
                 end
             end
-            
             obj.vl = varvl;
-        end
-        
+        end     
     end
 end
