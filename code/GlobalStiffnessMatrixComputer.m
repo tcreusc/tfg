@@ -6,9 +6,7 @@ classdef GlobalStiffnessMatrixComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
         KGlobal
-        Fext
-        leng %residual?
-        Kelem
+        KElem
     end
     
     properties(Access = private)
@@ -29,7 +27,6 @@ classdef GlobalStiffnessMatrixComputer < handle
                 
         function obj = compute(obj)
             obj.createLocalStiffnessBars();
-            obj.createForcesMatrix(); % no s'hauria de fer aqui
             obj.assembleGlobalMatrix();
         end
     end
@@ -52,14 +49,7 @@ classdef GlobalStiffnessMatrixComputer < handle
                 Ke = obj.initializeStiffnessMatrices(nodes);
                 Kel = obj.calculateLocalStiffness(iElem,Ke, Kel);
             end
-            obj.Kelem = Kel;
-        end
-        
-        function createForcesMatrix(obj)
-            obj.Fext = zeros(obj.dim.ndof,1);
-            for i = 1:height(obj.fdata)
-               obj.Fext ( nod3dof( obj.fdata(i,1), obj.fdata(i,2) ) ,1) = obj.fdata(i,3);
-            end
+            obj.KElem = Kel;
         end
         
         function assembleGlobalMatrix(obj)
@@ -73,12 +63,11 @@ classdef GlobalStiffnessMatrixComputer < handle
                     I = obj.Td(e,i);
                     for j = 1:nne*ni
                         J = obj.Td(e,j);
-                        Kg(I, J) = Kg(I, J) + obj.Kelem(i,j,e);
+                        Kg(I, J) = Kg(I, J) + obj.KElem(i,j,e);
                     end
                 end
             end
             obj.KGlobal = Kg;
-
         end
         
         function n = initializeNodes(obj, e)

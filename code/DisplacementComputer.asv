@@ -45,7 +45,7 @@ classdef DisplacementComputer < handle
             obj.data = cParams.data;
         end
         
-        function splitDOFMatrices(obj)
+        function splitSystemDOFs(obj) % fusionar-ho amb solvesyst i reanoenar
             s.dim         = obj.dim;
             s.data.fixnod = obj.data.fixnod;
             DOFfixer = DOFFixer(s);

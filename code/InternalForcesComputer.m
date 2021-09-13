@@ -1,4 +1,4 @@
-%% Funció computeInternal(dim,u,x,Tn,Td,Kel)
+%% Funció computeInternal(dim,u,x,Tn,Td,KElem)
 % Retorna els esforcos axials, tallants i els moments de cada barra
 % elemental
 classdef InternalForcesComputer < handle
@@ -12,7 +12,7 @@ classdef InternalForcesComputer < handle
         x
         Tn
         Td
-        Kel
+        KElem
     end
     
     methods(Access = public)
@@ -31,21 +31,21 @@ classdef InternalForcesComputer < handle
     
     methods(Access = private)
         function init(obj, cParams)
-            obj.dim = cParams.dim;
-            obj.u = cParams.u;
-            obj.x = cParams.data.x;
-            obj.Tn = cParams.data.Tn;
-            obj.Td = cParams.Td;
-            obj.Kel = cParams.Kel;  
+            obj.dim   = cParams.dim;
+            obj.u     = cParams.u;
+            obj.x     = cParams.data.x;
+            obj.Tn    = cParams.data.Tn;
+            obj.Td    = cParams.Td;
+            obj.KElem = cParams.KElem;  
         end
         
-        function calculateInternal(obj,dim,u,x,Tn,Td,Kel, mat, Tmat)
+        function calculateInternal(obj,dim,u,x,Tn,Td,KElem, mat, Tmat)
              for e = 1:dim.nel
                 stiffnessElement = stiffnessElementCalculator(x, Tn, e);
                 stiffnessMaterial = stiffnessMaterialData(mat,Tmat,e);
                 Re = stiffnessLocalMatrixCalculator(stiffnessElement, stiffnessMaterial).Re;
                 ue = computeInternalDisplacements(dim, e, Td, u);
-                Feint = Re*Kel(:,:,e)*ue;
+                Feint = Re*KElem(:,:,e)*ue;
                 vFx(e,1) = -Feint(1);
                 vFx(e,2) = Feint(4);
                 vFy(e,1) = -Feint(2);
@@ -59,22 +59,22 @@ classdef InternalForcesComputer < handle
              
         end
         
-        function nodes = initializeNodes(obj, e)
-            nodes.x1e = obj.x(obj.Tn(e,1), 1);
-            nodes.x2e = obj.x(obj.Tn(e,2), 1);
-            nodes.y1e = obj.x(obj.Tn(e,1), 2);
-            nodes.y2e = obj.x(obj.Tn(e,2), 2);
-            nodes.le = sqrt((nodes.x2e - nodes.x1e)^2 + (nodes.y2e - nodes.y1e)^2);
+        function n = initializeNodes(obj, e)
+            n.x1e = obj.x(obj.Tn(e,1), 1);
+            n.x2e = obj.x(obj.Tn(e,2), 1);
+            n.y1e = obj.x(obj.Tn(e,1), 2);
+            n.y2e = obj.x(obj.Tn(e,2), 2);
+            n.le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2);
         end
         
-        function Re = initializeMatrix(obj, nodes) % moure a classe propia
-            Re = 1/nodes.le* [
-                nodes.x2e - nodes.x1e, nodes.y2e - nodes.y1e, 0, 0, 0, 0;
-                -(nodes.y2e - nodes.y1e), nodes.x2e - nodes.x1e, 0, 0, 0, 0;
-                0, 0, nodes.le, 0, 0, 0;
-                0, 0, 0, nodes.x2e - nodes.x1e, nodes.y2e - nodes.y1e, 0;
-                0, 0, 0, -(nodes.y2e - nodes.y1e), nodes.x2e - nodes.x1e, 0;
-                0, 0, 0, 0, 0, nodes.le;
+        function Re = initializeMatrix(obj, n) % moure a classe propia
+            Re = 1/n.le* [
+                n.x2e - n.x1e, n.y2e - n.y1e, 0, 0, 0, 0;
+                -(n.y2e - n.y1e), n.x2e - n.x1e, 0, 0, 0, 0;
+                0, 0, n.le, 0, 0, 0;
+                0, 0, 0, n.x2e - n.x1e, n.y2e - n.y1e, 0;
+                0, 0, 0, -(n.y2e - n.y1e), n.x2e - n.x1e, 0;
+                0, 0, 0, 0, 0, n.le;
                 ];
         end
         
@@ -83,7 +83,7 @@ classdef InternalForcesComputer < handle
                     I = obj.Td(e,i);
                     ue(i,1) = obj.u(I);
                 end
-                Feint = Re*obj.Kel(:,:,e)*ue;
+                Feint = Re*obj.KElem(:,:,e)*ue;
                 obj.Fx(e,1) = -Feint(1);
                 obj.Fx(e,2) = Feint(4);
                 obj.Fy(e,1) = -Feint(2);

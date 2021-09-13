@@ -10,7 +10,7 @@ classdef Analysis < handle
         solvertype
         results
         Td
-        Kel, KG, Fext
+        KElem, KGlobal, Fext
         ur, vr, vl, u
         Fx, Fy, Mz
         R
@@ -24,30 +24,23 @@ classdef Analysis < handle
             obj.init();
         end
 
-        function [u] = getDisplacements(obj)
-            u = obj.u;
-        end
-                
         function obj = perform(obj)
-            obj.connectDOFs(); %computeMesh/Connectivity
+            obj.computeMesh();
             obj.computeStiffnessMatrix();
-            obj.splitDOFs();
-            obj.solveSystem(); %computeDisplacements
-            obj.computeInternal(); %computeStress
+            obj.computeForces();
+            obj.computeDisplacements();
+            obj.computeStress();
         end  
         
         function check(obj)
             tolerance = 1e15*eps(min(abs(obj.results),abs(obj.u)));
-            
             if abs(obj.results-obj.u) < tolerance
                 obj.passed = 1;
                 fprintf('Test ') ; cprintf('-comment', 'passed') ; fprintf('!\n') ;
             else
                 obj.passed = 0;
                 fprintf('Test ') ; cprintf('-err', 'failed') ; fprintf('!\n') ;
-                
-            end     
-            
+            end
         end
     end
     
@@ -55,14 +48,13 @@ classdef Analysis < handle
         
         function init(obj)
             run(obj.dataFile)
-            obj.data = data;
-            obj.dim = dim;
+            obj.data       = data;
+            obj.dim        = dim;
             obj.solvertype = solvertype;
-            obj.results = results;
+            obj.results    = results;
         end
                 
-        function connectDOFs(obj)
-            %computeConnectivityMatr
+        function computeMesh(obj)
             vTd = zeros(obj.dim.nel,obj.dim.nne*obj.dim.ni);
             for e = 1:obj.dim.nel
                 for i = 1:obj.dim.nne
@@ -76,45 +68,41 @@ classdef Analysis < handle
         end
         
         function computeStiffnessMatrix(obj)
+            s.dim  = obj.dim;
+            s.data = obj.data;
+            s.Td   = obj.Td;
+            GSMComputer = GlobalStiffnessMatrixComputer(s);
+            GSMComputer.compute();
+            obj.KElem   = GSMComputer.KElem;
+            obj.KGlobal = GSMComputer.KGlobal;
+        end
+        
+        function computeForces(obj)
+            s.dim  = obj.dim;
+            s.data = obj.data;
+            FC = ForcesComputer(s);
+            FC.compute();
+            obj.Fext = FC.Fext;
+        end
+        
+        function computeDisplacements(obj)
+            s.KGlobal = obj.KGlobal;
+            s.Fext = obj.Fext;
+            s.solvertype = obj.solvertype;
             s.dim = obj.dim;
             s.data = obj.data;
-            s.Td = obj.Td;
-            Kcomputer = GlobalStiffnessMatrix(s); %GSMComputer
-            Kcomputer.compute();
-            obj.Kel = Kcomputer.Kel; %KElem
-            obj.KG = Kcomputer.KG; %KGlobal
-            obj.Fext = Kcomputer.Fext; % fora d'aqui, no hi ha cohesio
+            DC = DisplacementComputer(s);
+            DC.compute();
+            obj.u = DC.u;
+            obj.R = DC.R;
         end
         
-        function splitDOFs(obj) % fusionar-ho amb solvesyst i reanoenar
-            s.dim = obj.dim;
-            s.data.fixnod = obj.data.fixnod;
-            DOFfixer = DOFFixer(s);
-            DOFfixer.fix();
-            obj.ur = DOFfixer.ur;
-            obj.vr = DOFfixer.vr;
-            obj.vl = DOFfixer.vl;
-        end
-               
-        function solveSystem(obj)
-            s.KG = obj.KG;
-            s.Fext = obj.Fext;
-            s.ur = obj.ur;
-            s.vr = obj.vr;
-            s.vl = obj.vl;
-            s.solvertype = obj.solvertype;
-            FSS = ForceSystemSolver(s);
-            FSS.solve();
-            obj.u = FSS.u;
-            obj.R = FSS.R;
-        end
-        
-        function computeInternal(obj)
+        function computeStress(obj)
             s.dim = obj.dim;
             s.data = obj.data;
             s.u = obj.u;
             s.Td = obj.Td;
-            s.Kel = obj.Kel;
+            s.KElem = obj.KElem;
             IFC = InternalForcesComputer(s);
             IFC.compute();
             obj.Fx = IFC.Fx;
