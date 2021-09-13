@@ -2,13 +2,13 @@
 % Retorna la matriu de rigidesa de cadascuna de les barres element i la
 % llargada de cadascuna de les barres
 
-classdef GlobalStiffnessMatrix < handle
+classdef GlobalStiffnessMatrixComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
-        KG
+        KGlobal
         Fext
         leng %residual?
-        Kel
+        Kelem
     end
     
     properties(Access = private)
@@ -23,7 +23,7 @@ classdef GlobalStiffnessMatrix < handle
     end
     
     methods(Access = public)
-        function obj = GlobalStiffnessMatrix(cParams)
+        function obj = GlobalStiffnessMatrixComputer(cParams)
             obj.init(cParams);
         end
                 
@@ -46,13 +46,13 @@ classdef GlobalStiffnessMatrix < handle
         end
         
         function createLocalStiffnessBars(obj)
+            Kel = zeros(obj.dim.nne*obj.dim.ni,obj.dim.nne*obj.dim.ni,obj.dim.nel);
             for iElem = 1:obj.dim.nel
                 nodes = obj.initializeNodes(iElem);
                 Ke = obj.initializeStiffnessMatrices(nodes);
-                Kel = obj.calculateLocalStiffness(iElem,Ke);
+                Kel = obj.calculateLocalStiffness(iElem,Ke, Kel);
             end
-            %refer, ens ho guardem al final i aixi no hi hem d'entrar
-            obj.Kel = Kel;
+            obj.Kelem = Kel;
         end
         
         function createForcesMatrix(obj)
@@ -63,19 +63,21 @@ classdef GlobalStiffnessMatrix < handle
         end
         
         function assembleGlobalMatrix(obj)
-            %canviar ndof = obj.dim.ndof i anar fent
-            Kg = zeros(obj.dim.ndof,obj.dim.ndof);
-            for e = 1:obj.dim.nel
-                for i = 1:obj.dim.nne*obj.dim.ni
+            ndof = obj.dim.ndof;
+            nne  = obj.dim.nne;
+            ni   = obj.dim.ni;
+            nel  = obj.dim.nel;
+            Kg = zeros(ndof,ndof);
+            for e = 1:nel
+                for i = 1:nne*ni
                     I = obj.Td(e,i);
-                    % obj.Fext(I) = obj.Fext(I)+ 0; % No hi ha força elemental
-                    for j = 1:obj.dim.nne*obj.dim.ni
+                    for j = 1:nne*ni
                         J = obj.Td(e,j);
-                        Kg(I, J) = Kg(I, J) + obj.Kel(i,j,e);
+                        Kg(I, J) = Kg(I, J) + obj.Kelem(i,j,e);
                     end
                 end
             end
-            obj.KG = Kg;
+            obj.KGlobal = Kg;
 
         end
         
@@ -119,10 +121,10 @@ classdef GlobalStiffnessMatrix < handle
             Ke = transpose(Re)* Keprima * Re; % moure a funcio rotateStiffnessMatrix
         end
         
-        function Kel = calculateLocalStiffness(obj, e, Ke) %refer
+        function Kel = calculateLocalStiffness(obj, e, Ke, Kel) %refer
             for r =1:obj.dim.nne*obj.dim.ni
                 for s = 1:obj.dim.nne*obj.dim.ni
-                    obj.Kel (r,s,e) = Ke(r,s);
+                    Kel (r,s,e) = Ke(r,s);
                 end
             end
         end            
