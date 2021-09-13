@@ -13,9 +13,10 @@ classdef ElementStiffnessMatrix< handle
             obj.init(cParams);
         end
                 
-        function obj = compute(obj)
-            obj.create();
+        function obj = create(obj)
+            obj.initializeStiffnessMatrix(n);
             obj.assembleGlobalMatrix();
+            
         end
     end
     
@@ -30,32 +31,33 @@ classdef ElementStiffnessMatrix< handle
             obj.Td    = cParams.Td;
         end
                 
-        function Ke = initializeStiffnessMatrices(obj, n)
+        function Ke = initializeStiffnessMatrix(obj, n)
             % crear amb zeros i anar omplint
             % refer nodes
-            Re = 1/n.le* [
-                n.x2e - n.x1e, n.y2e - n.y1e, 0, 0, 0, 0;
-                -(n.y2e - n.y1e), n.x2e - n.x1e, 0, 0, 0, 0;
-                0, 0, n.le, 0, 0, 0;
-                0, 0, 0, n.x2e - n.x1e, n.y2e - n.y1e, 0;
-                0, 0, 0, -(n.y2e - n.y1e), n.x2e - n.x1e, 0;
-                0, 0, 0, 0, 0, n.le;
-                ];
-            Keprima = n.Ize*n.Ee/n.le^3 * [
-                0, 0, 0, 0, 0, 0;
-                0, 12, 6*n.le, 0, -12, 6*n.le;
-                0, 6*n.le, 4*n.le^2, 0, -6*n.le, 2*n.le^2;
-                0, 0, 0, 0, 0, 0;
-                0, -12, -6*n.le, 0, 12, -6*n.le;
-                0, 6*n.le, 2*n.le^2, 0, -6*n.le, 4*n.le^2;
-                ] + n.Ae*n.Ee/n.le * [
-                1, 0, 0, -1, 0, 0;
-                0, 0, 0, 0, 0, 0;
-                0, 0, 0, 0, 0, 0;
-                -1, 0, 0, 1, 0, 0;
-                0, 0, 0, 0, 0, 0;
-                0, 0, 0, 0, 0, 0;        
-                ];
+            le  = n.le;
+            c1 = n.Ize*n.Ee/le^3;
+            c2 = n.Ae*n.Ee/le;
+            Keprima = zeros(6,6);
+            Keprima(1,1) = c2;
+            Keprima(1,4) = -c2;
+            Keprima(2,2) = c1 * 12;
+            Keprima(2,3) = c1 * 6*le;
+            Keprima(2,5) = c1 * (-12);
+            Keprima(2,6) = c1 * 6*le;
+            Keprima(3,2) = c1 * 6*le;
+            Keprima(3,3) = c1 * 4*le^2;
+            Keprima(3,5) = c1 * (-6*le);
+            Keprima(3,6) = c1 * 2*le^2;
+            Keprima(4,1) = -c2;
+            Keprima(4,4) = c2;
+            Keprima(5,2) = -12*c1;
+            Keprima(5,3) = -6*le*c1;
+            Keprima(5,5) = 12*c1;
+            Keprima(5,6) = -6*le*c1;
+            Keprima(6,2) = 6*le*c1;
+            Keprima(6,3) = 2*le^2*c1;
+            Keprima(6,5) = -6*le*c1;
+            Keprima(6,6) = 4*le^2*c1;
             Ke = transpose(Re)* Keprima * Re; % moure a funcio rotateStiffnessMatrix
         end           
     end
