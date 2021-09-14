@@ -29,8 +29,6 @@ classdef ForcesComputer < handle
             obj.dim   = cParams.dim;
             obj.fdata = cParams.data.fdata;
         end
-        
-        function createForcesMatrix(obj)
-        end
+
     end
 end

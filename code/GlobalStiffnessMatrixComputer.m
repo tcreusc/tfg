@@ -1,7 +1,3 @@
-%% Funció stiffnessBars(dim,x,Tn,mat,Tmat)
-% Retorna la matriu de rigidesa de cadascuna de les barres element i la
-% llargada de cadascuna de les barres
-
 classdef GlobalStiffnessMatrixComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
@@ -46,8 +42,9 @@ classdef GlobalStiffnessMatrixComputer < handle
             Kel = zeros(obj.dim.nne*obj.dim.ni,obj.dim.nne*obj.dim.ni,obj.dim.nel);
             for iElem = 1:obj.dim.nel
                 nodes = obj.initializeNodes(iElem);
-                Ke = obj.initializeStiffnessMatrices(nodes);
-                Kel = obj.calculateLocalStiffness(iElem,Ke, Kel);
+                [Keprima, Re] = obj.initializeStiffnessMatrices(nodes);
+                Ke = obj.calculateLocalStiffnessMatrix(Keprima, Re);
+                Kel = obj.assembleElementStiffness(iElem,Ke, Kel);
             end
             obj.KElem = Kel;
         end
@@ -71,60 +68,44 @@ classdef GlobalStiffnessMatrixComputer < handle
         end
         
         function n = initializeNodes(obj, e)
-            n.x1e = obj.x(obj.Tn(e,1), 1);
-            n.x2e = obj.x(obj.Tn(e,2), 1);
-            n.y1e = obj.x(obj.Tn(e,1), 2);
-            n.y2e = obj.x(obj.Tn(e,2), 2);
-            n.le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2); % moure a funcio
-            n.Ee = obj.mat(obj.Tmat(e),1);
-            n.Ae = obj.mat(obj.Tmat(e),2);
-            n.Ize = obj.mat(obj.Tmat(e),3);
+            X    = obj.x;
+            Tnod   = obj.Tn;
+            Mat  = obj.mat;
+            Tmater = obj.Tmat;
+            n.x1e = X(Tnod(e,1), 1);
+            n.x2e = X(Tnod(e,2), 1);
+            n.y1e = X(Tnod(e,1), 2);
+            n.y2e = X(Tnod(e,2), 2);
+            n.le  = obj.calculateElementLength(n);
+            n.Ee  = Mat(Tmater(e),1);
+            n.Ae  = Mat(Tmater(e),2);
+            n.Ize = Mat(Tmater(e),3);
         end
         
-        function Ke = initializeStiffnessMatrices(obj, n)
-            % crear amb zeros i anar omplint
-            % refer nodes
-            Re = 1/n.le* [
-                n.x2e - n.x1e, n.y2e - n.y1e, 0, 0, 0, 0;
-                -(n.y2e - n.y1e), n.x2e - n.x1e, 0, 0, 0, 0;
-                0, 0, n.le, 0, 0, 0;
-                0, 0, 0, n.x2e - n.x1e, n.y2e - n.y1e, 0;
-                0, 0, 0, -(n.y2e - n.y1e), n.x2e - n.x1e, 0;
-                0, 0, 0, 0, 0, n.le;
-                ];
-            le  = n.le;
-            c1 = n.Ize*n.Ee/le^3;
-            c2 = n.Ae*n.Ee/le;
-            Keprima = zeros(6,6);
-            Keprima(1,1) = c2;
-            Keprima(1,4) = -c2;
-            Keprima(2,2) = c1 * 12;
-            Keprima(2,3) = c1 * 6*le;
-            Keprima(2,5) = c1 * (-12);
-            Keprima(2,6) = c1 * 6*le;
-            Keprima(3,2) = c1 * 6*le;
-            Keprima(3,3) = c1 * 4*le^2;
-            Keprima(3,5) = c1 * (-6*le);
-            Keprima(3,6) = c1 * 2*le^2;
-            Keprima(4,1) = -c2;
-            Keprima(4,4) = c2;
-            Keprima(5,2) = -12*c1;
-            Keprima(5,3) = -6*le*c1;
-            Keprima(5,5) = 12*c1;
-            Keprima(5,6) = -6*le*c1;
-            Keprima(6,2) = 6*le*c1;
-            Keprima(6,3) = 2*le^2*c1;
-            Keprima(6,5) = -6*le*c1;
-            Keprima(6,6) = 4*le^2*c1;
-            Ke = transpose(Re)* Keprima * Re; % moure a funcio rotateStiffnessMatrix
+        function le = calculateElementLength(obj, n)
+            le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2);
         end
         
-        function Kel = calculateLocalStiffness(obj, e, Ke, Kel) %refer
+        function [Ke, Re] = initializeStiffnessMatrices(obj, n)
+            s.n = n;
+            RM = RotationMatrixComputer(s);
+            RM.compute();
+            Re = RM.RotationMatrix;
+            ESC = ElementStiffnessComputer(s);
+            ESC.compute();
+            Ke = ESC.Keprima;
+        end
+        
+        function Ke = calculateLocalStiffnessMatrix(obj, K, R)
+            Ke = transpose(R) * K * R;
+        end
+        
+        function Kel = assembleElementStiffness(obj, e, Ke, Kel)
             for r =1:obj.dim.nne*obj.dim.ni
                 for s = 1:obj.dim.nne*obj.dim.ni
                     Kel (r,s,e) = Ke(r,s);
                 end
             end
-        end            
+        end
     end
 end

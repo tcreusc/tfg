@@ -1,7 +1,4 @@
-%% Funció computeInternal(dim,u,x,Tn,Td,KElem)
-% Retorna els esforcos axials, tallants i els moments de cada barra
-% elemental
-classdef InternalForcesComputer < handle
+classdef StressComputer < handle
     properties (SetAccess = private, GetAccess = public)
         Fx, Fy, Mz
     end
@@ -16,14 +13,14 @@ classdef InternalForcesComputer < handle
     end
     
     methods(Access = public)
-        function obj = InternalForcesComputer(cParams)
+        function obj = StressComputer(cParams)
             obj.init(cParams);
         end
         
         function obj = compute(obj)
             for e = 1:obj.dim.nel
                 nodes = obj.initializeNodes(e);
-                Re = obj.initializeMatrix(nodes);
+                Re = obj.createRotationMatrix(nodes);
                 obj.calculateForces(e, Re);
             end
         end
@@ -39,26 +36,6 @@ classdef InternalForcesComputer < handle
             obj.KElem = cParams.KElem;  
         end
         
-        function calculateInternal(obj,dim,u,x,Tn,Td,KElem, mat, Tmat)
-             for e = 1:dim.nel
-                stiffnessElement = stiffnessElementCalculator(x, Tn, e);
-                stiffnessMaterial = stiffnessMaterialData(mat,Tmat,e);
-                Re = stiffnessLocalMatrixCalculator(stiffnessElement, stiffnessMaterial).Re;
-                ue = computeInternalDisplacements(dim, e, Td, u);
-                Feint = Re*KElem(:,:,e)*ue;
-                vFx(e,1) = -Feint(1);
-                vFx(e,2) = Feint(4);
-                vFy(e,1) = -Feint(2);
-                vFy(e,2) = Feint(5);
-                vMz(e,1) = -Feint(3);
-                vMz(e,2) = Feint(6);
-             end
-             obj.Fx = vFx;
-             obj.Fy = vFy;
-             obj.Mz = vMz;
-             
-        end
-        
         function n = initializeNodes(obj, e)
             n.x1e = obj.x(obj.Tn(e,1), 1);
             n.x2e = obj.x(obj.Tn(e,2), 1);
@@ -67,15 +44,11 @@ classdef InternalForcesComputer < handle
             n.le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2);
         end
         
-        function Re = initializeMatrix(obj, n) % moure a classe propia
-            Re = 1/n.le* [
-                n.x2e - n.x1e, n.y2e - n.y1e, 0, 0, 0, 0;
-                -(n.y2e - n.y1e), n.x2e - n.x1e, 0, 0, 0, 0;
-                0, 0, n.le, 0, 0, 0;
-                0, 0, 0, n.x2e - n.x1e, n.y2e - n.y1e, 0;
-                0, 0, 0, -(n.y2e - n.y1e), n.x2e - n.x1e, 0;
-                0, 0, 0, 0, 0, n.le;
-                ];
+        function Re = createRotationMatrix(obj, n)
+            s.n = n;
+            RM = RotationMatrixComputer(s);
+            RM.compute();
+            Re = RM.RotationMatrix;
         end
         
         function calculateForces(obj, e, Re)

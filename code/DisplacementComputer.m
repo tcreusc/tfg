@@ -1,11 +1,5 @@
-%% Funció solveSystem(KGlobal,Fext,ur,vr,vl)
-% Soluciona el sistema, i retorna una matriu amb el desplacament de cada
-% DOF, i una matriu amb les forces de reaccio
-
 classdef DisplacementComputer < handle
 
-    % ForcesComputer
-    % DisplacementComputer
     properties(SetAccess = private, GetAccess = public)
         u, R
     end

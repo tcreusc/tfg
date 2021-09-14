@@ -103,11 +103,11 @@ classdef Analysis < handle
             s.u = obj.u;
             s.Td = obj.Td;
             s.KElem = obj.KElem;
-            IFC = InternalForcesComputer(s);
-            IFC.compute();
-            obj.Fx = IFC.Fx;
-            obj.Fy = IFC.Fy;
-            obj.Mz = IFC.Mz;
+            SC = StressComputer(s);
+            SC.compute();
+            obj.Fx = SC.Fx;
+            obj.Fy = SC.Fy;
+            obj.Mz = SC.Mz;
         end
         
     end
