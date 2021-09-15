@@ -7,6 +7,6 @@ clc; clear;
 % dataFile = fullfile(DFfilename, DFpathstr);
 
 dataFile = 'dades.m';
-analysis = Analysis(dataFile);
-analysis.perform();
-analysis.check();
+test = Test(dataFile);
+test.runAnalyses();
+test.check();

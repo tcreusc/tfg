@@ -32,11 +32,11 @@ classdef DisplacementComputer < handle
     methods(Access = private)   
         
         function init(obj, cParams)
-            obj.KGlobal = cParams.KGlobal;
-            obj.Fext = cParams.Fext;
+            obj.KGlobal    = cParams.KGlobal;
+            obj.Fext       = cParams.Fext;
             obj.solvertype = cParams.solvertype;
-            obj.dim = cParams.dim;
-            obj.data = cParams.data;
+            obj.dim        = cParams.dim;
+            obj.data       = cParams.data;
         end
         
         function splitDOFMatrices(obj)

@@ -111,7 +111,7 @@ dim.ni = 3;           % Degrees of freedom per node
 dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
 
 % Solver to use
-solvertype = 'DIRECT';
+% solvertype = 'DIRECT';
 
 % Expected results
 results = [0.3591; 0.0024; 0.4474; 0.1980; 0.0024; 0.4474; 0.0242; 0.0024; 0.1917; 0; 0; 0; 0; 0; 0];

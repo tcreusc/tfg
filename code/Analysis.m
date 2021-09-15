@@ -1,17 +1,16 @@
 classdef Analysis < handle
     
     properties(SetAccess = private, GetAccess = public)
-        passed
+        u
     end
     
     properties(Access = private)
         dataFile
         data
         solvertype
-        results
         Td
         KElem, KGlobal, Fext
-        ur, vr, vl, u
+        ur, vr, vl
         Fx, Fy, Mz
         R
         dim
@@ -19,9 +18,8 @@ classdef Analysis < handle
     
     methods(Access = public)
         
-        function obj = Analysis(dataFile)
-            obj.dataFile  = dataFile;
-            obj.init();
+        function obj = Analysis(cParams)
+            obj.init(cParams);
         end
 
         function obj = perform(obj)
@@ -31,27 +29,15 @@ classdef Analysis < handle
             obj.computeDisplacements();
             obj.computeStress();
         end  
-        
-        function check(obj)
-            tolerance = 1e15*eps(min(abs(obj.results),abs(obj.u)));
-            if abs(obj.results-obj.u) < tolerance
-                obj.passed = 1;
-                fprintf('Test ') ; cprintf('-comment', 'passed') ; fprintf('!\n') ;
-            else
-                obj.passed = 0;
-                fprintf('Test ') ; cprintf('-err', 'failed') ; fprintf('!\n') ;
-            end
-        end
+
     end
     
     methods(Access = private)   
         
-        function init(obj)
-            run(obj.dataFile)
-            obj.data       = data;
-            obj.dim        = dim;
-            obj.solvertype = solvertype;
-            obj.results    = results;
+        function init(obj, cParams)
+            obj.data       = cParams.data;
+            obj.dim        = cParams.dim;
+            obj.solvertype = cParams.solvertype;
         end
                 
         function computeMesh(obj)
@@ -108,8 +94,7 @@ classdef Analysis < handle
             obj.Fx = SC.Fx;
             obj.Fy = SC.Fy;
             obj.Mz = SC.Mz;
-        end
-        
+        end 
     end
 end
 
