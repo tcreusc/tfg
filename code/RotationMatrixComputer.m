@@ -39,9 +39,7 @@ classdef RotationMatrixComputer < handle
     methods(Access = private)   
         function init(obj, cParams)
             obj.nodes = cParams.n;
-        end
-                
-                   
+        end            
     end
 end
 

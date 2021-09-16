@@ -1,8 +1,3 @@
-%% Funció fixedDOF(dim,fixnod)
-% A partir de la matriu introduida de nodes fixats, retorna tres matrius:
-%   (1) Matriu ur. Conte els desplacaments dels nodes fixats
-%   (2) Matriu vr. Conte els DOFs fixats
-%   (3) Matriu vl. Conte els DOFs lliures
 classdef DOFFixer < handle
 
     properties(SetAccess = private, GetAccess = public)

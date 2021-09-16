@@ -1,7 +1,7 @@
 classdef DisplacementComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
-        u, R
+        displacement
     end
     
     properties(Access = private)
@@ -50,8 +50,8 @@ classdef DisplacementComputer < handle
         end
         
         function calculateSystemLHSRHS(obj)
-            KLL = obj.KGlobal(obj.vl, obj.vl);
-            KLR = obj.KGlobal(obj.vl, obj.vr);
+            KLL   = obj.KGlobal(obj.vl, obj.vl);
+            KLR   = obj.KGlobal(obj.vl, obj.vr);
             FLext = obj.Fext(obj.vl,1);        
             obj.LHS = FLext - KLR*obj.ur;
             obj.RHS = KLL; 
@@ -64,9 +64,8 @@ classdef DisplacementComputer < handle
         end
         
         function calculateDisplacement(obj)
-            obj.u(obj.vl,1) = obj.ul;
-            obj.u(obj.vr,1) = obj.ur;
+            obj.displacement(obj.vl,1) = obj.ul;
+            obj.displacement(obj.vr,1) = obj.ur;
         end
-        
     end
 end

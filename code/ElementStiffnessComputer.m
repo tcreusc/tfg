@@ -1,7 +1,7 @@
 classdef ElementStiffnessComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
-        Keprima
+        KBase
     end
     
     properties(Access = private)
@@ -14,8 +14,8 @@ classdef ElementStiffnessComputer < handle
         end
                 
         function obj = compute(obj)
-            n = obj.nodes;
-            le  = n.le;
+            n  = obj.nodes;
+            le = n.le;
             c1 = n.Ize*n.Ee/le^3;
             c2 = n.Ae*n.Ee/le;
             K = zeros(6,6);
@@ -39,7 +39,7 @@ classdef ElementStiffnessComputer < handle
             K(6,3) = 2*le^2*c1;
             K(6,5) = -6*le*c1;
             K(6,6) = 4*le^2*c1;
-            obj.Keprima = K;
+            obj.KBase = K;
         end
     end
     

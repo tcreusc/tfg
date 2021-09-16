@@ -12,8 +12,7 @@ classdef Test < handle
         dispIterative, passedIterative
     end
     
-    methods(Access = public)
-        
+    methods(Access = public)   
         function obj = Test(cParams)
             obj.init(cParams);
         end
@@ -24,12 +23,14 @@ classdef Test < handle
         end
         
         function check(obj)
-            obj.passedDirect = obj.checkResults(obj.dispDirect, 'DIRECT');
+            obj.passedDirect    = obj.checkResults(obj.dispDirect, 'DIRECT');
             obj.passedIterative = obj.checkResults(obj.dispDirect, 'ITERATIVE');
             if (obj.passedDirect && obj.passedIterative)
                 obj.passed = 1;
+                obj.displayStatus(obj.passed, 'GLOBAL');
             else
                 obj.passed = 0;
+                obj.displayStatus(obj.passed, 'GLOBAL');
             end
         end
     end
@@ -49,7 +50,7 @@ classdef Test < handle
             s.solvertype = 'DIRECT';
             analysis = Analysis(s);
             analysis.perform();
-            obj.dispDirect = analysis.u;
+            obj.dispDirect = analysis.displacement;
         end
         
         function runIterativeAnalysis(obj)
@@ -58,17 +59,15 @@ classdef Test < handle
             s.solvertype = 'ITERATIVE';
             analysis = Analysis(s);
             analysis.perform();
-            obj.dispIterative = analysis.u;
+            obj.dispIterative = analysis.displacement;
         end
         
         function passed = checkResults(obj, disp, type)
             tolerance = 1e15*eps(min(abs(obj.results),abs(disp)));
             if abs(obj.results-disp) < tolerance
                 passed = 1;
-                obj.displayStatus(passed, type);
             else
                 passed = 0;
-                obj.displayStatus(passed, type);
             end
         end
         

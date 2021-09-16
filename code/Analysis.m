@@ -1,7 +1,7 @@
 classdef Analysis < handle
     
     properties(SetAccess = private, GetAccess = public)
-        u
+        displacement
     end
     
     properties(Access = private)
@@ -12,7 +12,6 @@ classdef Analysis < handle
         KElem, KGlobal, Fext
         ur, vr, vl
         Fx, Fy, Mz
-        R
         dim
     end
     
@@ -41,11 +40,14 @@ classdef Analysis < handle
         end
                 
         function computeMesh(obj)
-            vTd = zeros(obj.dim.nel,obj.dim.nne*obj.dim.ni);
-            for e = 1:obj.dim.nel
-                for i = 1:obj.dim.nne
-                    for j = 1:obj.dim.ni
-                        I = obj.dim.ni*(i-1)+j;
+            nel = obj.dim.nel;
+            nne = obj.dim.nne;
+            ni  = obj.dim.ni;
+            vTd = zeros(nel,nne*ni);
+            for e = 1:nel
+                for i = 1:nne
+                    for j = 1:ni
+                        I = ni*(i-1)+j;
                         vTd(e,I) = obj.dim.ni*(obj.data.Tn(e,i)-1)+j;
                     end
                 end
@@ -57,10 +59,10 @@ classdef Analysis < handle
             s.dim  = obj.dim;
             s.data = obj.data;
             s.Td   = obj.Td;
-            GSMComputer = GlobalStiffnessMatrixComputer(s);
-            GSMComputer.compute();
-            obj.KElem   = GSMComputer.KElem;
-            obj.KGlobal = GSMComputer.KGlobal;
+            GSMComp = GlobalStiffnessMatrixComputer(s);
+            GSMComp.compute();
+            obj.KElem   = GSMComp.KElem;
+            obj.KGlobal = GSMComp.KGlobal;
         end
         
         function computeForces(obj)
@@ -72,22 +74,21 @@ classdef Analysis < handle
         end
         
         function computeDisplacements(obj)
-            s.KGlobal = obj.KGlobal;
-            s.Fext = obj.Fext;
+            s.KGlobal    = obj.KGlobal;
+            s.Fext       = obj.Fext;
             s.solvertype = obj.solvertype;
-            s.dim = obj.dim;
-            s.data = obj.data;
+            s.dim        = obj.dim;
+            s.data       = obj.data;
             DC = DisplacementComputer(s);
             DC.compute();
-            obj.u = DC.u;
-            obj.R = DC.R;
+            obj.displacement = DC.displacement;
         end
         
         function computeStress(obj)
-            s.dim = obj.dim;
-            s.data = obj.data;
-            s.u = obj.u;
-            s.Td = obj.Td;
+            s.dim   = obj.dim;
+            s.data  = obj.data;
+            s.u     = obj.displacement;
+            s.Td    = obj.Td;
             s.KElem = obj.KElem;
             SC = StressComputer(s);
             SC.compute();
