@@ -49,4 +49,3 @@ classdef ElementStiffnessComputer < handle
         end
     end
 end
-

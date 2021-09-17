@@ -15,10 +15,10 @@ classdef ForcesComputer < handle
         end
 
         function obj = compute(obj)
-            fdata = obj.fdata;
+            Fdata = obj.fdata;
             forces = zeros(obj.dim.ndof,1);
             for i = 1:height(obj.fdata)
-               forces ( nod3dof( fdata(i,1), fdata(i,2) ) ,1) = fdata(i,3);
+               forces ( nod3dof( Fdata(i,1), Fdata(i,2) ) ,1) = Fdata(i,3);
             end
             obj.Fext = forces;
         end

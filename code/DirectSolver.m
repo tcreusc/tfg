@@ -5,4 +5,3 @@ classdef DirectSolver < Solver
         end
     end
 end
-

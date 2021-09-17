@@ -8,12 +8,11 @@ classdef StressComputer < handle
         u
         x
         Tn
-        Td
+        Tconn
         KElem
     end
     
     methods(Access = public)
-        
         function obj = StressComputer(cParams)
             obj.init(cParams);
         end
@@ -22,11 +21,11 @@ classdef StressComputer < handle
             for iElem = 1:obj.dim.nel
                 elem = obj.initializeElement(iElem);
                 Re = obj.createRotationMatrix(elem);
-                ue = obj.calculateElementDisplacement(iElem);
-                Feint = obj.calculateForces(iElem, Re, ue); % millor no assignar-ho aqui
-            end        
+                ue = obj.calculateElemenTconnisplacement(iElem);
+                Feint = obj.calculateForces(iElem, Re, ue);
+            end
+            obj.assignForces(Feint);
         end
-        
     end
     
     methods(Access = private)
@@ -35,7 +34,7 @@ classdef StressComputer < handle
             obj.u     = cParams.u;
             obj.x     = cParams.data.x;
             obj.Tn    = cParams.data.Tn;
-            obj.Td    = cParams.Td;
+            obj.Tconn    = cParams.Tconn;
             obj.KElem = cParams.KElem;  
         end
         
@@ -54,25 +53,31 @@ classdef StressComputer < handle
             Re = RM.RotationMatrix;
         end
         
-        function uelem = calculateElementDisplacement(obj, iElem)
+        function uelem = calculateElemenTconnisplacement(obj, iElem)
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
             uelem = zeros(nne*ni,1);
             for i = 1:nne*ni
-                    I = obj.Td(iElem,i);
-                    uelem(i,1) = obj.u(I);
+                I = obj.Tconn(iElem,i);
+                uelem(i,1) = obj.u(I);
             end
         end
         
         function Feint = calculateForces(obj, e, Re, uelem)
-                Feint = Re*obj.KElem(:,:,e)*uelem;
-                obj.Fx(e,1) = -Feint(1);
-                obj.Fx(e,2) = Feint(4);
-                obj.Fy(e,1) = -Feint(2);
-                obj.Fy(e,2) = Feint(5);
-                obj.Mz(e,1) = -Feint(3);
-                obj.Mz(e,2) = Feint(6);
+            Feint = Re*obj.KElem(:,:,e)*uelem;
         end
+        
+        function assignForces(obj, F)
+            for e = 1:obj.dim.nel
+                obj.Fx(e,1) = -F(1);
+                obj.Fx(e,2) =  F(4);
+                obj.Fy(e,1) = -F(2);
+                obj.Fy(e,2) =  F(5);
+                obj.Mz(e,1) = -F(3);
+                obj.Mz(e,2) =  F(6);
+            end
+        end
+        
         function le = calculateElementLength(obj, n)
             le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2);
         end

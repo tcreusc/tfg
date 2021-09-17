@@ -12,7 +12,7 @@ classdef GlobalStiffnessMatrixComputer < handle
         Tn
         mat
         Tmat
-        Td
+        Tconn
         fdata
     end
     
@@ -35,13 +35,13 @@ classdef GlobalStiffnessMatrixComputer < handle
             obj.mat   = cParams.data.mat;
             obj.Tmat  = cParams.data.Tmat;
             obj.fdata = cParams.data.fdata;
-            obj.Td    = cParams.Td;
+            obj.Tconn = cParams.Tconn;
         end
         
         function createElementStiffness(obj)
+            nel = obj.dim.nel;
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
-            nel = obj.dim.nel;
             Kelem = zeros(nne*ni,nne*ni,nel);
             for iElem = 1:nel
                 elem = obj.initializeElement(iElem);
@@ -58,12 +58,12 @@ classdef GlobalStiffnessMatrixComputer < handle
             ni   = obj.dim.ni;
             nel  = obj.dim.nel;
             Kg = zeros(ndof,ndof);
-            for e = 1:nel
+            for elem = 1:nel
                 for i = 1:nne*ni
-                    I = obj.Td(e,i);
+                    I = obj.Tconn(elem,i);
                     for j = 1:nne*ni
-                        J = obj.Td(e,j);
-                        Kg(I, J) = Kg(I, J) + obj.KElem(i,j,e);
+                        J = obj.Tconn(elem,j);
+                        Kg(I, J) = Kg(I, J) + obj.KElem(i,j,elem);
                     end
                 end
             end
@@ -110,6 +110,5 @@ classdef GlobalStiffnessMatrixComputer < handle
                 end
             end
         end
-        
     end
 end

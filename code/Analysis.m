@@ -8,7 +8,7 @@ classdef Analysis < handle
         dataFile
         data
         solvertype
-        Td
+        Tconn
         KElem, KGlobal, Fext
         ur, vr, vl
         Fx, Fy, Mz
@@ -43,22 +43,22 @@ classdef Analysis < handle
             nel = obj.dim.nel;
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
-            vTd = zeros(nel,nne*ni);
+            vTconn = zeros(nel,nne*ni);
             for e = 1:nel
                 for i = 1:nne
                     for j = 1:ni
                         I = ni*(i-1)+j;
-                        vTd(e,I) = obj.dim.ni*(obj.data.Tn(e,i)-1)+j;
+                        vTconn(e,I) = obj.dim.ni*(obj.data.Tn(e,i)-1)+j;
                     end
                 end
             end
-            obj.Td = vTd;
+            obj.Tconn = vTconn;
         end
         
         function computeStiffnessMatrix(obj)
             s.dim  = obj.dim;
             s.data = obj.data;
-            s.Td   = obj.Td;
+            s.Tconn   = obj.Tconn;
             GSMComp = GlobalStiffnessMatrixComputer(s);
             GSMComp.compute();
             obj.KElem   = GSMComp.KElem;
@@ -88,7 +88,7 @@ classdef Analysis < handle
             s.dim   = obj.dim;
             s.data  = obj.data;
             s.u     = obj.displacement;
-            s.Td    = obj.Td;
+            s.Tconn = obj.Tconn;
             s.KElem = obj.KElem;
             SC = StressComputer(s);
             SC.compute();
@@ -98,4 +98,3 @@ classdef Analysis < handle
         end 
     end
 end
-

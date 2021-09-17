@@ -12,4 +12,3 @@ classdef (Abstract) Solver < handle
         end
     end
 end
-

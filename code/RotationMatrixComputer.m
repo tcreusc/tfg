@@ -1,5 +1,4 @@
 classdef RotationMatrixComputer < handle
-
     properties(SetAccess = private, GetAccess = public)
         RotationMatrix
     end
@@ -42,4 +41,3 @@ classdef RotationMatrixComputer < handle
         end            
     end
 end
-
