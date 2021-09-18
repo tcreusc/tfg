@@ -38,7 +38,7 @@ classdef Test < handle
     methods(Access = private)
         function init(obj, cParams)
             run(cParams)
-            obj.dataFile = cParams;
+            obj.dataFile  = cParams;
             obj.data       = data;
             obj.dim        = dim;
             obj.results    = results;

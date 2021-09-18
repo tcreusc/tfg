@@ -1,4 +1,4 @@
-classdef Analysis < handle
+classdef Analysis < handle % potser reanomenar
     
     properties(SetAccess = private, GetAccess = public)
         displacement
@@ -39,20 +39,21 @@ classdef Analysis < handle
             obj.solvertype = cParams.solvertype;
         end
                 
-        function computeMesh(obj)
+        function computeMesh(obj)%Connectivities
             nel = obj.dim.nel;
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
-            vTconn = zeros(nel,nne*ni);
+            T = zeros(nel,nne*ni);
             for e = 1:nel
                 for i = 1:nne
                     for j = 1:ni
                         I = ni*(i-1)+j;
-                        vTconn(e,I) = obj.dim.ni*(obj.data.Tn(e,i)-1)+j;
+                        Tn = obj.data.Tn(e,i);
+                        T(e,I) = ni*(Tn-1)+j;
                     end
                 end
             end
-            obj.Tconn = vTconn;
+            obj.connectivities = T;
         end
         
         function computeStiffnessMatrix(obj)

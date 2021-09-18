@@ -1,6 +1,6 @@
 classdef GlobalStiffnessMatrixComputer < handle
 
-    properties(SetAccess = private, GetAccess = public)
+    properties(SetAccess = private, GetAccess = public) % stiffnessmatrix sense global
         KGlobal
         KElem
     end
@@ -47,7 +47,8 @@ classdef GlobalStiffnessMatrixComputer < handle
                 elem = obj.initializeElement(iElem);
                 [KBase, Re] = obj.initializeStiffnessMatrices(elem);
                 Ke = obj.calculateLocalStiffnessMatrix(KBase, Re);
-                Kelem = obj.assembleElementStiffness(iElem,Ke, Kelem);
+                K = obj.assembleElementStiffness(iElem,Ke); % en dos passos
+                Kelem(:,:,iElem) = K;
             end
             obj.KElem = Kelem;
         end
@@ -63,6 +64,7 @@ classdef GlobalStiffnessMatrixComputer < handle
                     I = obj.Tconn(elem,i);
                     for j = 1:nne*ni
                         J = obj.Tconn(elem,j);
+                        % obj.Kelem ... 
                         Kg(I, J) = Kg(I, J) + obj.KElem(i,j,elem);
                     end
                 end
@@ -70,26 +72,26 @@ classdef GlobalStiffnessMatrixComputer < handle
             obj.KGlobal = Kg;
         end
         
-        function elem = initializeElement(obj, e)
+        function n = initializeElement(obj, e)
             X    = obj.x;
             Tnod   = obj.Tn;
             Mat  = obj.mat;
             Tmater = obj.Tmat;
-            elem.x1e = X(Tnod(e,1), 1);
-            elem.x2e = X(Tnod(e,2), 1);
-            elem.y1e = X(Tnod(e,1), 2);
-            elem.y2e = X(Tnod(e,2), 2);
-            elem.le  = obj.calculateElementLength(elem);
-            elem.Ee  = Mat(Tmater(e),1);
-            elem.Ae  = Mat(Tmater(e),2);
-            elem.Ize = Mat(Tmater(e),3);
+            n.x1e = X(Tnod(e,1), 1);
+            n.x2e = X(Tnod(e,2), 1);
+            n.y1e = X(Tnod(e,1), 2);
+            n.y2e = X(Tnod(e,2), 2);
+            n.le  = obj.calculateElementLength(n);
+            n.Ee  = Mat(Tmater(e),1);
+            n.Ae  = Mat(Tmater(e),2);
+            n.Ize = Mat(Tmater(e),3);
         end
         
         function le = calculateElementLength(obj, n)
             le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2);
         end
         
-        function [KB, Re] = initializeStiffnessMatrices(obj, n)
+        function [KB, Re] = initializeStiffnessMatrices(obj, n) % passar a Static, separar en rotation i euclidean stiffness
             s.n = n;
             RM = RotationMatrixComputer(s);
             RM.compute();
@@ -99,11 +101,12 @@ classdef GlobalStiffnessMatrixComputer < handle
             KB = ESC.KBase;
         end
         
-        function Ke = calculateLocalStiffnessMatrix(obj, K, R)
+        function Ke = calculateLocalStiffnessMatrix(obj, K, R) %rotateStiffnessMat
             Ke = transpose(R) * K * R;
         end
         
         function Kel = assembleElementStiffness(obj, e, Ke, Kel)
+            % construir aqui, que no surti el mateix que entra
             for r =1:obj.dim.nne*obj.dim.ni
                 for s = 1:obj.dim.nne*obj.dim.ni
                     Kel (r,s,e) = Ke(r,s);

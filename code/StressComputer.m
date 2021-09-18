@@ -20,8 +20,8 @@ classdef StressComputer < handle
         function obj = compute(obj)
             for iElem = 1:obj.dim.nel
                 elem = obj.initializeElement(iElem);
-                Re = obj.createRotationMatrix(elem);
-                ue = obj.calculateElemenTconnisplacement(iElem);
+                Re = obj.createRotationMatrix(elem); % barra mes que element
+                ue = obj.calculateElementDisplacement(iElem);
                 Feint = obj.calculateForces(iElem, Re, ue);
             end
             obj.assignForces(Feint);

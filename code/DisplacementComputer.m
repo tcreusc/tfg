@@ -25,7 +25,7 @@ classdef DisplacementComputer < handle
             obj.splitDOFMatrices();
             obj.calculateSystemLHSRHS();
             obj.calculateSystemSolution();
-            obj.calculateDisplacement();    
+            obj.calculateDisplacement();
         end
     end
     
@@ -39,7 +39,7 @@ classdef DisplacementComputer < handle
             obj.data       = cParams.data;
         end
         
-        function splitDOFMatrices(obj)
+        function splitDOFMatrices(obj) % reduceStiffnessMatri
             s.dim         = obj.dim;
             s.data.fixnod = obj.data.fixnod;
             DOFfixer = DOFFixer(s);
@@ -59,7 +59,7 @@ classdef DisplacementComputer < handle
         
         function calculateSystemSolution(obj)
             solver = Solver.create(obj.solvertype);
-            solution = solver.solve(obj.RHS, obj.LHS);
+            solution = solver.solve(obj.RHS, obj.LHS); % en comptes de LHS i RHS, F i K. sentit fisic!
             obj.ul = solution;
         end
         
