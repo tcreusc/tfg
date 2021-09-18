@@ -4,7 +4,7 @@ classdef RotationMatrixComputer < handle
     end
     
     properties(Access = private)
-        nodes
+        bar
     end
     
     methods(Access = public)
@@ -13,12 +13,12 @@ classdef RotationMatrixComputer < handle
         end
                 
         function obj = compute(obj)
-            n = obj.nodes;
+            n = obj.bar;
             le = n.le;
-            x1 = n.x1e;
-            x2 = n.x2e;
-            y1 = n.y1e;
-            y2 = n.y2e;
+            x1 = n.x1;
+            x2 = n.x2;
+            y1 = n.y1;
+            y2 = n.y2;
             coef = 1/le;
             Re = zeros(6,6);
             Re(1,1) =   coef * (x2-x1);
@@ -37,7 +37,7 @@ classdef RotationMatrixComputer < handle
     
     methods(Access = private)   
         function init(obj, cParams)
-            obj.nodes = cParams.n;
+            obj.bar = cParams;
         end            
     end
 end

@@ -5,7 +5,7 @@ classdef ElementStiffnessComputer < handle
     end
     
     properties(Access = private)
-        nodes
+        bar
     end
     
     methods(Access = public)
@@ -14,10 +14,10 @@ classdef ElementStiffnessComputer < handle
         end
                 
         function obj = compute(obj)
-            n  = obj.nodes;
+            n  = obj.bar;
             le = n.le;
-            c1 = n.Ize*n.Ee/le^3;
-            c2 = n.Ae*n.Ee/le;
+            c1 = n.Iz*n.E/le^3;
+            c2 = n.A*n.E/le;
             K = zeros(6,6);
             K(1,1) = c2;
             K(1,4) = -c2;
@@ -45,7 +45,7 @@ classdef ElementStiffnessComputer < handle
     
     methods(Access = private)   
         function init(obj, cParams)
-            obj.nodes = cParams.n;
+            obj.bar = cParams;
         end
     end
 end

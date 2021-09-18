@@ -4,10 +4,9 @@ classdef StressComputer < handle
     end
     
     properties (Access = private)
+        data
         dim
         displacement
-        x
-        Tn
         connectivities
         KElem
     end
@@ -19,8 +18,8 @@ classdef StressComputer < handle
         
         function obj = compute(obj)
             for iElem = 1:obj.dim.nel
-                elem = obj.initializeElement(iElem);
-                Re = obj.createRotationMatrix(elem); % barra mes que element
+                bar = obj.createBar(iElem);
+                Re = bar.calculateRotationMatrix();
                 ue = obj.calculateElementDisplacement(iElem);
                 Feint = obj.calculateForces(iElem, Re, ue);
             end
@@ -30,27 +29,17 @@ classdef StressComputer < handle
     
     methods(Access = private)
         function init(obj, cParams)
-            obj.dim   = cParams.dim;
-            obj.displacement     = cParams.displacement;
-            obj.x     = cParams.data.x;
-            obj.Tn    = cParams.data.Tn;
-            obj.connectivities    = cParams.connectivities;
-            obj.KElem = cParams.KElem;  
+            obj.dim            = cParams.dim;
+            obj.data           = cParams.data;
+            obj.KElem          = cParams.KElem;  
+            obj.displacement   = cParams.displacement;
+            obj.connectivities = cParams.connectivities;
         end
         
-        function n = initializeElement(obj, e)
-            n.x1e = obj.x(obj.Tn(e,1), 1);
-            n.x2e = obj.x(obj.Tn(e,2), 1);
-            n.y1e = obj.x(obj.Tn(e,1), 2);
-            n.y2e = obj.x(obj.Tn(e,2), 2);
-            n.le  = obj.calculateElementLength(n);
-        end
-        
-        function Re = createRotationMatrix(obj, n)
-            s.n = n;
-            RM = RotationMatrixComputer(s);
-            RM.compute();
-            Re = RM.RotationMatrix;
+        function bar = createBar(obj, e)
+            s.data = obj.data;
+            bar = Bar(s);
+            bar.create(e);
         end
         
         function uelem = calculateElementDisplacement(obj, iElem)
@@ -63,8 +52,9 @@ classdef StressComputer < handle
             end
         end
         
-        function Feint = calculateForces(obj, e, Re, uelem)
-            Feint = Re*obj.KElem(:,:,e)*uelem;
+        function Feint = calculateForces(obj, e, Re, uElem)
+            K = obj.KElem(:,:,e);
+            Feint = Re * K * uElem;
         end
         
         function assignForces(obj, F)
@@ -78,8 +68,5 @@ classdef StressComputer < handle
             end
         end
         
-        function le = calculateElementLength(obj, n)
-            le = sqrt((n.x2e - n.x1e)^2 + (n.y2e - n.y1e)^2);
-        end
     end
 end
