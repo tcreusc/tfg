@@ -5,10 +5,10 @@ classdef StressComputer < handle
     
     properties (Access = private)
         dim
-        u
+        displacement
         x
         Tn
-        Tconn
+        connectivities
         KElem
     end
     
@@ -31,10 +31,10 @@ classdef StressComputer < handle
     methods(Access = private)
         function init(obj, cParams)
             obj.dim   = cParams.dim;
-            obj.u     = cParams.u;
+            obj.displacement     = cParams.displacement;
             obj.x     = cParams.data.x;
             obj.Tn    = cParams.data.Tn;
-            obj.Tconn    = cParams.Tconn;
+            obj.connectivities    = cParams.connectivities;
             obj.KElem = cParams.KElem;  
         end
         
@@ -53,13 +53,13 @@ classdef StressComputer < handle
             Re = RM.RotationMatrix;
         end
         
-        function uelem = calculateElemenTconnisplacement(obj, iElem)
+        function uelem = calculateElementDisplacement(obj, iElem)
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
             uelem = zeros(nne*ni,1);
             for i = 1:nne*ni
-                I = obj.Tconn(iElem,i);
-                uelem(i,1) = obj.u(I);
+                I = obj.connectivities(iElem,i);
+                uelem(i,1) = obj.displacement(I);
             end
         end
         

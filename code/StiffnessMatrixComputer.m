@@ -1,4 +1,4 @@
-classdef GlobalStiffnessMatrixComputer < handle
+classdef StiffnessMatrixComputer < handle
 
     properties(SetAccess = private, GetAccess = public) % stiffnessmatrix sense global
         KGlobal
@@ -12,12 +12,13 @@ classdef GlobalStiffnessMatrixComputer < handle
         Tn
         mat
         Tmat
-        Tconn
+        connectivities
         fdata
     end
     
     methods(Access = public)
-        function obj = GlobalStiffnessMatrixComputer(cParams)
+        
+        function obj = StiffnessMatrixComputer(cParams)
             obj.init(cParams);
         end
                 
@@ -25,17 +26,19 @@ classdef GlobalStiffnessMatrixComputer < handle
             obj.createElementStiffness();
             obj.assembleGlobalMatrix();
         end
+        
     end
     
-    methods(Access = private)   
+    methods(Access = private)
+        
         function init(obj, cParams)
-            obj.dim   = cParams.dim;
-            obj.x     = cParams.data.x;
-            obj.Tn    = cParams.data.Tn;
-            obj.mat   = cParams.data.mat;
-            obj.Tmat  = cParams.data.Tmat;
-            obj.fdata = cParams.data.fdata;
-            obj.Tconn = cParams.Tconn;
+            obj.dim            = cParams.dim;
+            obj.x              = cParams.data.x;
+            obj.Tn             = cParams.data.Tn;
+            obj.mat            = cParams.data.mat;
+            obj.Tmat           = cParams.data.Tmat;
+            obj.fdata          = cParams.data.fdata;
+            obj.connectivities = cParams.connectivities;
         end
         
         function createElementStiffness(obj)
@@ -48,7 +51,7 @@ classdef GlobalStiffnessMatrixComputer < handle
                 [KBase, Re] = obj.initializeStiffnessMatrices(elem);
                 Ke = obj.calculateLocalStiffnessMatrix(KBase, Re);
                 K = obj.assembleElementStiffness(iElem,Ke); % en dos passos
-                Kelem(:,:,iElem) = K;
+                Kelem(:,:,iElem) = Ke;
             end
             obj.KElem = Kelem;
         end
@@ -61,11 +64,11 @@ classdef GlobalStiffnessMatrixComputer < handle
             Kg = zeros(ndof,ndof);
             for elem = 1:nel
                 for i = 1:nne*ni
-                    I = obj.Tconn(elem,i);
+                    I = obj.connectivities(elem,i);
                     for j = 1:nne*ni
-                        J = obj.Tconn(elem,j);
-                        % obj.Kelem ... 
-                        Kg(I, J) = Kg(I, J) + obj.KElem(i,j,elem);
+                        J = obj.connectivities(elem,j);
+                        Kel = obj.KElem(i, j, elem); 
+                        Kg(I, J) = Kg(I, J) + Kel;
                     end
                 end
             end
@@ -74,17 +77,18 @@ classdef GlobalStiffnessMatrixComputer < handle
         
         function n = initializeElement(obj, e)
             X    = obj.x;
-            Tnod   = obj.Tn;
+            nod1   = obj.Tn(e,1);
+            nod2   = obj.Tn(e,2);
             Mat  = obj.mat;
-            Tmater = obj.Tmat;
-            n.x1e = X(Tnod(e,1), 1);
-            n.x2e = X(Tnod(e,2), 1);
-            n.y1e = X(Tnod(e,1), 2);
-            n.y2e = X(Tnod(e,2), 2);
+            Tm = obj.Tmat(e);
+            n.x1e = X(nod1, 1);
+            n.x2e = X(nod2, 1);
+            n.y1e = X(nod1, 2);
+            n.y2e = X(nod2, 2);
             n.le  = obj.calculateElementLength(n);
-            n.Ee  = Mat(Tmater(e),1);
-            n.Ae  = Mat(Tmater(e),2);
-            n.Ize = Mat(Tmater(e),3);
+            n.Ee  = Mat(Tm,1);
+            n.Ae  = Mat(Tm,2);
+            n.Ize = Mat(Tm,3);
         end
         
         function le = calculateElementLength(obj, n)
@@ -105,13 +109,14 @@ classdef GlobalStiffnessMatrixComputer < handle
             Ke = transpose(R) * K * R;
         end
         
-        function Kel = assembleElementStiffness(obj, e, Ke, Kel)
+        function Kel = assembleElementStiffness(obj, e, Ke)
             % construir aqui, que no surti el mateix que entra
             for r =1:obj.dim.nne*obj.dim.ni
                 for s = 1:obj.dim.nne*obj.dim.ni
-                    Kel (r,s,e) = Ke(r,s);
+                    Kel = Ke(r,s);
                 end
             end
         end
+        
     end
 end

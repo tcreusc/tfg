@@ -19,19 +19,25 @@ classdef ForcesComputer < handle
             % moure a funcio a sota
             Fdata = obj.fdata;
             forces = zeros(obj.dim.ndof,1);
-            for i = 1:height(obj.fdata)
-%                F1 = Fdata(i,1);
-               forces ( nod3dof( Fdata(i,1), Fdata(i,2) ) ,1) = Fdata(i,3);
+            for i = 1:height(Fdata)
+               nod = Fdata(i,1);
+               dir = Fdata(i,2);
+               F   = Fdata(i,3);
+               DOF = nod3dof(nod, dir);
+               forces (DOF,1) = F;
             end
             obj.Fext = forces;
         end
         
     end
     
-    methods(Access = private)   
+    methods(Access = private)
+
         function init(obj, cParams)
             obj.dim   = cParams.dim;
             obj.fdata = cParams.data.fdata;
         end
+        
     end
+
 end

@@ -8,7 +8,7 @@ classdef Analysis < handle % potser reanomenar
         dataFile
         data
         solvertype
-        Tconn
+        connectivities
         KElem, KGlobal, Fext
         ur, vr, vl
         Fx, Fy, Mz
@@ -22,7 +22,7 @@ classdef Analysis < handle % potser reanomenar
         end
 
         function obj = perform(obj)
-            obj.computeMesh();
+            obj.computeConnectivities();
             obj.computeStiffnessMatrix();
             obj.computeForces();
             obj.computeDisplacements();
@@ -39,7 +39,7 @@ classdef Analysis < handle % potser reanomenar
             obj.solvertype = cParams.solvertype;
         end
                 
-        function computeMesh(obj)%Connectivities
+        function computeConnectivities(obj)
             nel = obj.dim.nel;
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
@@ -59,11 +59,11 @@ classdef Analysis < handle % potser reanomenar
         function computeStiffnessMatrix(obj)
             s.dim  = obj.dim;
             s.data = obj.data;
-            s.Tconn   = obj.Tconn;
-            GSMComp = GlobalStiffnessMatrixComputer(s);
-            GSMComp.compute();
-            obj.KElem   = GSMComp.KElem;
-            obj.KGlobal = GSMComp.KGlobal;
+            s.connectivities   = obj.connectivities;
+            KComp = StiffnessMatrixComputer(s);
+            KComp.compute();
+            obj.KElem   = KComp.KElem;
+            obj.KGlobal = KComp.KGlobal;
         end
         
         function computeForces(obj)
@@ -88,8 +88,8 @@ classdef Analysis < handle % potser reanomenar
         function computeStress(obj)
             s.dim   = obj.dim;
             s.data  = obj.data;
-            s.u     = obj.displacement;
-            s.Tconn = obj.Tconn;
+            s.displacement     = obj.displacement;
+            s.connectivities = obj.connectivities;
             s.KElem = obj.KElem;
             SC = StressComputer(s);
             SC.compute();

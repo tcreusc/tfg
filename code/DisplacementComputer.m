@@ -12,25 +12,27 @@ classdef DisplacementComputer < handle
         Fext
         ur, vr, vl
         ul
-        LHS, RHS
+        F, K
     end
     
     methods(Access = public)
-        
+
         function obj = DisplacementComputer(cParams)
             obj.init(cParams);
         end
 
         function obj = compute(obj)
-            obj.splitDOFMatrices();
-            obj.calculateSystemLHSRHS();
-            obj.calculateSystemSolution();
-            obj.calculateDisplacement();
+            obj.reduceStiffnessMatrix(); % repassar nom
+            obj.calculateFreeStiffnessMatrix();
+            obj.calculateForceMatrix();
+            obj.calculateFreeDisplacement();
+            obj.imposeFixedDisplacement();
         end
+
     end
     
-    methods(Access = private)   
-        
+    methods(Access = private)
+
         function init(obj, cParams)
             obj.KGlobal    = cParams.KGlobal;
             obj.Fext       = cParams.Fext;
@@ -38,8 +40,8 @@ classdef DisplacementComputer < handle
             obj.dim        = cParams.dim;
             obj.data       = cParams.data;
         end
-        
-        function splitDOFMatrices(obj) % reduceStiffnessMatri
+
+        function reduceStiffnessMatrix(obj)
             s.dim         = obj.dim;
             s.data.fixnod = obj.data.fixnod;
             DOFfixer = DOFFixer(s);
@@ -48,24 +50,27 @@ classdef DisplacementComputer < handle
             obj.vr = DOFfixer.vr;
             obj.vl = DOFfixer.vl;
         end
-        
-        function calculateSystemLHSRHS(obj)
+
+        function calculateFreeStiffnessMatrix(obj)
             KLL   = obj.KGlobal(obj.vl, obj.vl);
+            obj.K = KLL; 
+        end
+
+        function calculateForceMatrix(obj)
             KLR   = obj.KGlobal(obj.vl, obj.vr);
-            FLext = obj.Fext(obj.vl,1);        
-            obj.LHS = FLext - KLR*obj.ur;
-            obj.RHS = KLL; 
+            FLext = obj.Fext(obj.vl,1);
+            obj.F = FLext - KLR*obj.ur;
         end
-        
-        function calculateSystemSolution(obj)
+
+        function calculateFreeDisplacement(obj)
             solver = Solver.create(obj.solvertype);
-            solution = solver.solve(obj.RHS, obj.LHS); % en comptes de LHS i RHS, F i K. sentit fisic!
-            obj.ul = solution;
+            solution = solver.solve(obj.K, obj.F);
+            obj.displacement(obj.vl,1) = solution;
         end
-        
-        function calculateDisplacement(obj)
-            obj.displacement(obj.vl,1) = obj.ul;
+
+        function imposeFixedDisplacement(obj)
             obj.displacement(obj.vr,1) = obj.ur;
         end
+
     end
 end
