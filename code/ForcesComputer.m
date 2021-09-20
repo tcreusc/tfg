@@ -16,17 +16,7 @@ classdef ForcesComputer < handle
         end
 
         function obj = compute(obj)
-            % moure a funcio a sota
-            Fdata = obj.fdata;
-            F = zeros(obj.dim.ndof,1);
-            for i = 1:height(Fdata)
-               nod = Fdata(i,1);
-               dir = Fdata(i,2);
-               val   = Fdata(i,3);
-               DOF = nod3dof(nod, dir);
-               F(DOF,1) = val;
-            end
-            obj.Fext = F;
+            obj.calculateForcesMatrix();
         end
         
     end
@@ -38,6 +28,19 @@ classdef ForcesComputer < handle
             obj.fdata = cParams.data.fdata;
         end
         
+        function calculateForcesMatrix(obj)
+            Fdata = obj.fdata;
+            d = obj.dim;
+            ndof = d.ndof;
+            F = zeros(ndof,1);
+            for i = 1:height(Fdata)
+               val   = Fdata(i,3);
+               converter = NodeDOFConverter(d, Fdata, i);
+               DOF = converter.convert();
+               F(DOF,1) = val;
+            end
+            obj.Fext = F;
+        end
+        
     end
-
 end

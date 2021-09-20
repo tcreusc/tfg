@@ -22,8 +22,11 @@ classdef StressComputer < handle
                 Re = bar.calculateRotationMatrix();
                 ue = obj.calculateElementDisplacement(iElem);
                 Feint = obj.calculateForces(iElem, Re, ue);
+                [F_x, F_y, M_z] = obj.assignForces(iElem, Feint);
             end
-            obj.assignForces(Feint);
+            obj.Fx = F_x;
+            obj.Fy = F_y;
+            obj.Mz = M_z;
         end
     end
     
@@ -57,16 +60,18 @@ classdef StressComputer < handle
             Feint = Re * K * uElem;
         end
         
-        function assignForces(obj, F)
-            for e = 1:obj.dim.nel
-                obj.Fx(e,1) = -F(1);
-                obj.Fx(e,2) =  F(4);
-                obj.Fy(e,1) = -F(2);
-                obj.Fy(e,2) =  F(5);
-                obj.Mz(e,1) = -F(3);
-                obj.Mz(e,2) =  F(6);
-            end
-        end
+    end
+    
+    methods(Static)
         
+        function [Fx, Fy, Mz] = assignForces(e, F)
+                Fx(e,1) = -F(1);
+                Fx(e,2) =  F(4);
+                Fy(e,1) = -F(2);
+                Fy(e,2) =  F(5);
+                Mz(e,1) = -F(3);
+                Mz(e,2) =  F(6);
+        end
+
     end
 end

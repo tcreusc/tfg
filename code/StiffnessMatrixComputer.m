@@ -10,18 +10,18 @@ classdef StiffnessMatrixComputer < handle
         data
         connectivities
     end
-    
+
     methods(Access = public)
-        
+
         function obj = StiffnessMatrixComputer(cParams)
             obj.init(cParams);
         end
-                
+
         function obj = compute(obj)
             obj.createElementStiffness();
             obj.assembleGlobalMatrix();
         end
-        
+
     end
     
     methods(Access = private)
@@ -31,7 +31,7 @@ classdef StiffnessMatrixComputer < handle
             obj.data           = cParams.data;
             obj.connectivities = cParams.connectivities;
         end
-        
+
         function createElementStiffness(obj)
             nel = obj.dim.nel;
             nne = obj.dim.nne;
@@ -46,7 +46,7 @@ classdef StiffnessMatrixComputer < handle
             end
             obj.KElem = Kelem;
         end
-        
+
         function assembleGlobalMatrix(obj)
             ndof = obj.dim.ndof;
             nne  = obj.dim.nne;
@@ -65,7 +65,7 @@ classdef StiffnessMatrixComputer < handle
             end
             obj.KGlobal = Kg;
         end
-        
+
         function bar = createBar(obj, e)
             s.data = obj.data;
             bar = Bar(s);
@@ -74,10 +74,10 @@ classdef StiffnessMatrixComputer < handle
     end
 
     methods(Static)
-        
+
         function Ke = rotateStiffnessMatrix(K, R)
             Ke = transpose(R) * K * R;
         end
-        
+
     end
 end

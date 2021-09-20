@@ -5,45 +5,46 @@ classdef DOFFixer < handle
         fixedDOFs
         freeDOFs
     end
-    
+
     properties(Access = private)
         dim
         fixnod
     end
-    
+
     methods(Access = public)
         function obj = DOFFixer(cParams)
             obj.init(cParams);
         end
-        
+
         function obj = fix(obj)
             obj.calculateFixedData();
             obj.calculateFreeDOFs();
         end
     end
-    
+
     methods(Access = private)
         function init(obj, cParams)
-            obj.dim = cParams.dim;
+            obj.dim    = cParams.dim;
             obj.fixnod = cParams.data.fixnod;
         end
-        
+
         function calculateFixedData(obj)
             fnod = obj.fixnod;
+            d = obj.dim;
             h = height(fnod);
             vr = zeros(h, 1);
             ur = zeros(h, 1);
             for j = 1:h
-               nod = fnod(j,1);
-               dir = fnod(j,2);
                val = fnod(j,3);
-               vr(j) = nod3dof (nod, dir);
+               converter = NodeDOFConverter(d, fnod, j);
+               DOF = converter.convert();
+               vr(j) = DOF;
                ur(j) = val;
             end
             obj.fixedDOFs = vr;
             obj.fixedDisp = ur;
         end
-        
+
         function calculateFreeDOFs(obj)
             d = obj.dim;
             count = 1;
