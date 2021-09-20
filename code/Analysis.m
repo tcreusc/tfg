@@ -10,7 +10,6 @@ classdef Analysis < handle % potser reanomenar
         solvertype
         connectivities
         KElem, KGlobal, Fext
-        ur, vr, vl
         Fx, Fy, Mz
         dim
     end

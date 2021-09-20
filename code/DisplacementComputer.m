@@ -10,7 +10,7 @@ classdef DisplacementComputer < handle
         data
         KGlobal
         Fext
-        ur, vr, vl
+        fixedDisp, fixedDOFs, freeDOFs
         ul
         F, K
     end
@@ -46,30 +46,30 @@ classdef DisplacementComputer < handle
             s.data.fixnod = obj.data.fixnod;
             DOFfixer = DOFFixer(s);
             DOFfixer.fix();
-            obj.ur = DOFfixer.ur;
-            obj.vr = DOFfixer.vr;
-            obj.vl = DOFfixer.vl;
+            obj.fixedDisp = DOFfixer.fixedDisp;
+            obj.fixedDOFs = DOFfixer.fixedDOFs;
+            obj.freeDOFs  = DOFfixer.freeDOFs;
         end
 
         function calculateFreeStiffnessMatrix(obj)
-            KLL   = obj.KGlobal(obj.vl, obj.vl);
+            KLL   = obj.KGlobal(obj.freeDOFs, obj.freeDOFs);
             obj.K = KLL; 
         end
 
         function calculateForceMatrix(obj)
-            KLR   = obj.KGlobal(obj.vl, obj.vr);
-            FLext = obj.Fext(obj.vl,1);
-            obj.F = FLext - KLR*obj.ur;
+            KLR   = obj.KGlobal(obj.freeDOFs, obj.fixedDOFs);
+            FLext = obj.Fext(obj.freeDOFs,1);
+            obj.F = FLext - KLR*obj.fixedDisp;
         end
 
         function calculateFreeDisplacement(obj)
             solver = Solver.create(obj.solvertype);
             solution = solver.solve(obj.K, obj.F);
-            obj.displacement(obj.vl,1) = solution;
+            obj.displacement(obj.freeDOFs,1) = solution;
         end
 
         function imposeFixedDisplacement(obj)
-            obj.displacement(obj.vr,1) = obj.ur;
+            obj.displacement(obj.fixedDOFs,1) = obj.fixedDisp;
         end
 
     end

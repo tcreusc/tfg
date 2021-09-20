@@ -18,15 +18,15 @@ classdef ForcesComputer < handle
         function obj = compute(obj)
             % moure a funcio a sota
             Fdata = obj.fdata;
-            forces = zeros(obj.dim.ndof,1);
+            F = zeros(obj.dim.ndof,1);
             for i = 1:height(Fdata)
                nod = Fdata(i,1);
                dir = Fdata(i,2);
-               F   = Fdata(i,3);
+               val   = Fdata(i,3);
                DOF = nod3dof(nod, dir);
-               forces (DOF,1) = F;
+               F(DOF,1) = val;
             end
-            obj.Fext = forces;
+            obj.Fext = F;
         end
         
     end
