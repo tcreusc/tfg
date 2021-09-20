@@ -22,7 +22,7 @@ classdef DisplacementComputer < handle
         end
 
         function obj = compute(obj)
-            obj.reduceStiffnessMatrix(); % repassar nom
+            obj.reduceStiffnessMatrix();
             obj.calculateFreeStiffnessMatrix();
             obj.calculateForceMatrix();
             obj.calculateFreeDisplacement();
