@@ -1,4 +1,4 @@
-classdef Analysis < handle % potser reanomenar
+classdef FEMAnalyzer < handle % potser reanomenar
     
     properties(SetAccess = private, GetAccess = public)
         displacement
@@ -16,7 +16,7 @@ classdef Analysis < handle % potser reanomenar
     
     methods(Access = public)
         
-        function obj = Analysis(cParams)
+        function obj = FEMAnalyzer(cParams)
             obj.init(cParams);
         end
 

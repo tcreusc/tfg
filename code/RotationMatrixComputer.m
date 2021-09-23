@@ -20,7 +20,7 @@ classdef RotationMatrixComputer < handle
             y1 = n.y1;
             y2 = n.y2;
             coef = 1/le;
-            Re = zeros(6,6);
+            Re = sparse(6,6);
             Re(1,1) =   coef * (x2-x1);
             Re(1,2) =   coef * (y2-y1);
             Re(2,1) = - coef * (y2-y1);

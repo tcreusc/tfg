@@ -18,7 +18,7 @@ classdef ElementStiffnessComputer < handle
             le = n.le;
             c1 = n.Iz*n.E/le^3;
             c2 = n.A*n.E/le;
-            K = zeros(6,6);
+            K = sparse(6,6);
             K(1,1) = c2;
             K(1,4) = -c2;
             K(2,2) = c1 * 12;

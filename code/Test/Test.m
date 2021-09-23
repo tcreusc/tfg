@@ -48,7 +48,7 @@ classdef Test < handle
             s.data       = obj.data;
             s.dim        = obj.dim;
             s.solvertype = 'DIRECT';
-            analysis = Analysis(s);
+            analysis = FEMAnalyzer(s);
             analysis.perform();
             obj.dispDirect = analysis.displacement;
         end
@@ -57,7 +57,7 @@ classdef Test < handle
             s.data       = obj.data;
             s.dim        = obj.dim;
             s.solvertype = 'ITERATIVE';
-            analysis = Analysis(s);
+            analysis = FEMAnalyzer(s);
             analysis.perform();
             obj.dispIterative = analysis.displacement;
         end
