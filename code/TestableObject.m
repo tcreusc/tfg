@@ -7,11 +7,11 @@ classdef (Abstract) TestableObject < handle
     properties(Access = protected)
     end
     
-    methods(Access = public)
-    end
+%     methods(Access = public)
+%     end
     
-    methods(Access = protected)
-         function compute(obj)
+    methods(Access = public)
+         function obj = compute(obj)
             % A definir per cadascun dels solvers
         end
     end

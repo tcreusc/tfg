@@ -5,7 +5,6 @@ classdef FEMAnalyzer < TestableObject
     end
     
     properties(Access = private)
-        dataFile
         data
         solvertype
         connectivities
@@ -28,6 +27,12 @@ classdef FEMAnalyzer < TestableObject
             obj.computeStress();
         end  
 
+    end
+    
+    methods(Access = public)
+        function obj = compute(obj)
+            obj.perform();
+        end
     end
     
     methods(Access = private)   

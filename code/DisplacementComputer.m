@@ -22,7 +22,7 @@ classdef DisplacementComputer < TestableObject
         end
     end
     
-    methods(Access = protected)
+    methods(Access = public)
 
         function obj = compute(obj)
             obj.reduceStiffnessMatrix();

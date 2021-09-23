@@ -19,7 +19,7 @@ classdef StiffnessMatrixComputer < TestableObject
         
     end
     
-    methods(Access = protected)   
+    methods(Access = public)   
         
         function obj = compute(obj)
             obj.createElementStiffness();
