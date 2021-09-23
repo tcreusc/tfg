@@ -1,4 +1,4 @@
-classdef Test < handle
+classdef TestSolver < handle
     properties(SetAccess = private, GetAccess = public)
         passed
     end
@@ -13,7 +13,7 @@ classdef Test < handle
     end
     
     methods(Access = public)   
-        function obj = Test(cParams)
+        function obj = TestSolver(cParams)
             obj.init(cParams);
         end
 
@@ -32,6 +32,9 @@ classdef Test < handle
                 obj.passed = 0;
                 obj.displayStatus(obj.passed, 'GLOBAL');
             end
+            
+            
+            
         end
     end
     

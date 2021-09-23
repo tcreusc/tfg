@@ -1,4 +1,4 @@
-classdef DisplacementComputer < handle
+classdef DisplacementComputer < TestableObject
 
     properties(SetAccess = private, GetAccess = public)
         displacement
@@ -20,13 +20,16 @@ classdef DisplacementComputer < handle
         function obj = DisplacementComputer(cParams)
             obj.init(cParams);
         end
+    end
+    
+    methods(Access = protected)
 
         function obj = compute(obj)
             obj.reduceStiffnessMatrix();
             obj.calculateFreeStiffnessMatrix();
             obj.calculateForceMatrix();
             obj.calculateFreeDisplacement();
-            obj.imposeFixedDisplacement();
+            obj.calculateFixedDisplacement();
         end
 
     end
@@ -34,11 +37,11 @@ classdef DisplacementComputer < handle
     methods(Access = private)
 
         function init(obj, cParams)
-            obj.KGlobal    = cParams.KGlobal;
             obj.Fext       = cParams.Fext;
-            obj.solvertype = cParams.solvertype;
             obj.dim        = cParams.dim;
             obj.data       = cParams.data;
+            obj.KGlobal    = cParams.KGlobal;
+            obj.solvertype = cParams.solvertype;
         end
 
         function reduceStiffnessMatrix(obj)
@@ -57,9 +60,14 @@ classdef DisplacementComputer < handle
         end
 
         function calculateForceMatrix(obj)
-            KLR   = obj.KGlobal(obj.freeDOFs, obj.fixedDOFs);
-            FLext = obj.Fext(obj.freeDOFs,1);
-            obj.F = FLext - KLR*obj.fixedDisp;
+            KG        = obj.KGlobal;
+            F_ext	  = obj.Fext;
+            freeDOFS  = obj.freeDOFs;
+            fixedDOFS = obj.fixedDOFs;
+            fixedDis  = obj.fixedDisp;
+            KLR   = KG(freeDOFS, fixedDOFS);
+            FLext = F_ext(freeDOFS,1);
+            obj.F = FLext - KLR*fixedDis;
         end
 
         function calculateFreeDisplacement(obj)
@@ -68,7 +76,7 @@ classdef DisplacementComputer < handle
             obj.displacement(obj.freeDOFs,1) = solution;
         end
 
-        function imposeFixedDisplacement(obj)
+        function calculateFixedDisplacement(obj)
             obj.displacement(obj.fixedDOFs,1) = obj.fixedDisp;
         end
 

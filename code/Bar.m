@@ -1,4 +1,4 @@
-classdef Bar < handle
+classdef Bar < TestableObject
     
     properties(SetAccess = private, GetAccess = public)
         x1, y1
@@ -47,6 +47,9 @@ classdef Bar < handle
         end
     end
 
+    methods(Access = protected)
+    end
+    
     methods(Access = private)
         
         function init(obj, cParams)

@@ -22,11 +22,11 @@ classdef StressComputer < handle
                 Re = bar.calculateRotationMatrix();
                 ue = obj.calculateElementDisplacement(iElem);
                 Feint = obj.calculateForces(iElem, Re, ue);
-                [F_x, F_y, M_z] = obj.assignForces(iElem, Feint);
+                [FX, FY, MZ] = obj.assignForces(iElem, Feint);
             end
-            obj.Fx = F_x;
-            obj.Fy = F_y;
-            obj.Mz = M_z;
+            obj.Fx = FX;
+            obj.Fy = FY;
+            obj.Mz = MZ;
         end
     end
     

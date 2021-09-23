@@ -5,8 +5,10 @@ addpath Test
 clc; clear;
 
 dataFile = 'dades.m';
-test = Test(dataFile);
+%test = Test.create('FEM', dataFile);
+test = TestSolver(dataFile);
 test.runAnalyses();
 test.check();
 
-% ForcesComputer i DOFFixer tenen nod3dof
+%%%
+% test = TestSolver('STIFFNESS');

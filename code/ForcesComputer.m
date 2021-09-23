@@ -34,7 +34,7 @@ classdef ForcesComputer < handle
             ndof = d.ndof;
             F = zeros(ndof,1);
             for i = 1:height(Fdata)
-               val   = Fdata(i,3);
+               val = Fdata(i,3);
                converter = NodeDOFConverter(d, Fdata, i);
                DOF = converter.convert();
                F(DOF,1) = val;

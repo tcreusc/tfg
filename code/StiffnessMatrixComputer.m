@@ -1,4 +1,4 @@
-classdef StiffnessMatrixComputer < handle
+classdef StiffnessMatrixComputer < TestableObject
 
     properties(SetAccess = private, GetAccess = public)
         KGlobal
@@ -16,12 +16,16 @@ classdef StiffnessMatrixComputer < handle
         function obj = StiffnessMatrixComputer(cParams)
             obj.init(cParams);
         end
-
+        
+    end
+    
+    methods(Access = protected)   
+        
         function obj = compute(obj)
             obj.createElementStiffness();
             obj.assembleGlobalMatrix();
         end
-
+        
     end
     
     methods(Access = private)

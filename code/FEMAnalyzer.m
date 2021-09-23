@@ -1,4 +1,4 @@
-classdef FEMAnalyzer < handle % potser reanomenar
+classdef FEMAnalyzer < TestableObject
     
     properties(SetAccess = private, GetAccess = public)
         displacement
@@ -56,9 +56,9 @@ classdef FEMAnalyzer < handle % potser reanomenar
         end
         
         function computeStiffnessMatrix(obj)
-            s.dim  = obj.dim;
-            s.data = obj.data;
-            s.connectivities   = obj.connectivities;
+            s.dim            = obj.dim;
+            s.data           = obj.data;
+            s.connectivities = obj.connectivities;
             KComp = StiffnessMatrixComputer(s);
             KComp.compute();
             obj.KElem   = KComp.KElem;
@@ -74,20 +74,20 @@ classdef FEMAnalyzer < handle % potser reanomenar
         end
         
         function computeDisplacements(obj)
-            s.KGlobal    = obj.KGlobal;
-            s.Fext       = obj.Fext;
-            s.solvertype = obj.solvertype;
             s.dim        = obj.dim;
             s.data       = obj.data;
+            s.Fext       = obj.Fext;
+            s.KGlobal    = obj.KGlobal;
+            s.solvertype = obj.solvertype;
             DC = DisplacementComputer(s);
             DC.compute();
             obj.displacement = DC.displacement;
         end
         
         function computeStress(obj)
-            s.dim   = obj.dim;
-            s.data  = obj.data;
-            s.displacement     = obj.displacement;
+            s.dim            = obj.dim;
+            s.data           = obj.data;
+            s.displacement   = obj.displacement;
             s.connectivities = obj.connectivities;
             s.KElem = obj.KElem;
             SC = StressComputer(s);
