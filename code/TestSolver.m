@@ -1,4 +1,4 @@
-classdef (Abstract) TestSolver < handle
+classdef TestSolver < handle
     
     properties(SetAccess = protected, GetAccess = public)
         solucio
@@ -17,34 +17,10 @@ classdef (Abstract) TestSolver < handle
     end
     
     methods (Static)
-        function ttype = create(testType, dataFile)
-            run(dataFile)
-            switch testType
-                case {'BAR'}
-                    ttype = Bar();
-                case {'DISPLACEMENT'}
-                    ttype = DisplacementComputer();
-                case {'FEM'}
-                    s.data = data;
-                    s.dim = dim;
-                    s.solvertype = 'DIRECT';
-                    ttype = FEMAnalyzer(s);
-                case {'FORCES'}
-                    ttype = ForcesComputer();
-                case {'STIFFNESS'}
-                    ttype = StiffnessMatrixComputer();
-                case {'STRESS'}
-                    ttype = StressComputer();
-                otherwise
-                    error('Invalid Test Type.')
-            end
             
-        end
     end
     
     methods(Access = private)
-        function createTestObject(testType, dataFile)
-        end
     end
     
 end

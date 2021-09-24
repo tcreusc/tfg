@@ -17,3 +17,4 @@ test.checkPassed('dades.m')
 
 %%%
 % test = TestSolver('STIFFNESS');
+% eval StiffnessTest().checkPassed('dades_stiffness.m')

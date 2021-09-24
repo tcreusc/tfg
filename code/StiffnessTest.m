@@ -49,5 +49,6 @@ classdef StiffnessTest < Test
             maxDiffKg = max(diffKg, [], 'all');
             err = max(maxDiffKe,maxDiffKg);
         end
+        
     end
 end
