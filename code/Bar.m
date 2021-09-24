@@ -1,7 +1,6 @@
 classdef Bar < handle
     
-    properties(SetAccess = private, GetAccess = public)
-        x1, y1
+    properties(SetAccess = private, GetAccess = public) % fer privat
         x2, y2
         E, A, Iz
         le

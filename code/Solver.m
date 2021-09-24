@@ -11,4 +11,8 @@ classdef (Abstract) Solver < handle
             end
         end
     end
+    
+    methods (Access = protected, Abstract)
+        solve
+    end
 end

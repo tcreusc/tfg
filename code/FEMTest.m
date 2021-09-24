@@ -10,7 +10,7 @@ classdef FEMTest < Test
             obj.initFile();
             [directRes, iterRes] = obj.computeResults();
             maxError = obj.checkMaxError(directRes, iterRes);
-            tolerance = 1e-4;
+            tolerance = 1e-4; % moure-ho a l'initFile
             if maxError < tolerance
                 passed = 1;
             else
@@ -27,7 +27,7 @@ classdef FEMTest < Test
             obj.results = results;
         end
         
-        function [directRes, iterRes] = computeResults(obj)
+        function [directRes, iterRes] = computeResults(obj) % separar en dos
             s.dim        = obj.dim;
             s.data       = obj.data;
             s.solvertype = 'DIRECT';
@@ -40,7 +40,7 @@ classdef FEMTest < Test
             iterRes = FEM.displacement;
         end
     
-        function err = checkMaxError(obj, direct, iterative)
+        function err = checkMaxError(obj, direct, iterative) % checkError separadet
             results = obj.results;
             directDiff = abs(direct-results);
             directMaxError = max(directDiff);
