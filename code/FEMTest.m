@@ -1,53 +1,79 @@
 classdef FEMTest < Test
+    
     properties (Access = private)
         data
         dim
         results
+        tolerance
     end
     
     methods(Access = protected)
+
         function passed = passed(obj)
             obj.initFile();
             [directRes, iterRes] = obj.computeResults();
             maxError = obj.checkMaxError(directRes, iterRes);
-            tolerance = 1e-4; % moure-ho a l'initFile
-            if maxError < tolerance
+            tol = obj.tolerance;
+            if maxError < tol
                 passed = 1;
             else
                 passed = 0;
             end
-        end        
+        end
+
     end
     
     methods (Access = private)
+        
         function initFile(obj)
             run(obj.fileName)
-            obj.dim     = dim;
-            obj.data    = data;
-            obj.results = results;
+            obj.dim       = dim;
+            obj.data      = data;
+            obj.results   = results;
+            obj.tolerance = 1e-4;
         end
         
-        function [directRes, iterRes] = computeResults(obj) % separar en dos
+        function [dirRes, iterRes] = computeResults(obj)
+            dirRes  = obj.computeDirectResults();
+            iterRes = obj.computeIterativeResults();
+        end
+    
+        function error = checkMaxError(obj, directRes, iterRes) % checkError separadet
+            dirErr  = obj.calculateDirectError(directRes);
+            iterErr = obj.calculateIterativeError(iterRes);
+            error = max(dirErr,iterErr);
+        end
+        
+        function results = computeDirectResults(obj)
             s.dim        = obj.dim;
             s.data       = obj.data;
             s.solvertype = 'DIRECT';
             FEM = FEMAnalyzer(s);
             FEM.perform();
-            directRes = FEM.displacement;
+            results = FEM.displacement;
+        end
+        
+        function maxError = calculateDirectError(obj, directRes)
+            values = obj.results;
+            error = abs(directRes - values);
+            maxError = max(error);
+        end
+        
+        function results = computeIterativeResults(obj)
+            s.dim        = obj.dim;
+            s.data       = obj.data;
             s.solvertype = 'ITERATIVE';
             FEM = FEMAnalyzer(s);
             FEM.perform();
-            iterRes = FEM.displacement;
+            results = FEM.displacement;
         end
-    
-        function err = checkMaxError(obj, direct, iterative) % checkError separadet
-            results = obj.results;
-            directDiff = abs(direct-results);
-            directMaxError = max(directDiff);
-            iterativeDiff = abs(iterative-results);
-            iterativeMaxError = max(iterativeDiff);
-            err = max(directMaxError,iterativeMaxError);
+        
+        function error = calculateIterativeError(obj, iterRes)
+            values = obj.results;
+            diff = abs(iterRes - values);
+            error = max(diff);
         end
+
     end
 end
 

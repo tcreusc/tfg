@@ -1,12 +1,14 @@
 classdef StiffnessTest < Test
-    
+
     properties (Access = private)
         data
         dim
         connectivities
+        KComp
     end
     
     methods(Access = protected)
+
         function passed = passed(obj)
             obj.initFile();
             [Ke, Kg] = obj.computeResults();
@@ -17,17 +19,19 @@ classdef StiffnessTest < Test
             else
                 passed = 0;
             end
-        end        
+        end
+
     end
-    
+
     methods (Access = private)
         function initFile(obj)
             run(obj.fileName)
             obj.dim            = dim;
             obj.data           = data;
+            obj.KComp          = KComp;
             obj.connectivities = connectivities;
         end
-        
+
         function [Ke, Kg] = computeResults(obj)
             s.dim            = obj.dim;
             s.data           = obj.data;
@@ -37,17 +41,23 @@ classdef StiffnessTest < Test
             Ke = SMC.KElem;
             Kg = SMC.KGlobal;
         end
-    end
-    
-    methods (Static, Access = private)
-        
-        function err = checkMaxError(Ke, Kg)
-            load matlab.mat KComp;
-            diffKE = abs(KComp.KElem-Ke);
-            maxDiffKe = max(diffKE, [], 'all');
-            diffKg = abs(KComp.KGlobal-Kg);
-            maxDiffKg = max(diffKg, [], 'all');
-            err = max(maxDiffKe,maxDiffKg);
+
+        function maxError = checkMaxError(obj, Ke, Kg)
+            KEError  = obj.calculateKElemError(Ke);
+            KGError  = obj.calculateKGlobalError(Kg);
+            maxError = max(KEError, KGError);
+        end
+
+        function error = calculateKElemError(obj, Ke)
+            value = obj.KComp.KElem;
+            diff = abs(value - Ke);
+            error = max(diff, [], 'all');            
+        end
+
+        function error = calculateKGlobalError(obj, Kg)
+            value = obj.KComp.KGlobal;
+            diff = abs(value - Kg);
+            error = max(diff, [], 'all');            
         end
         
     end

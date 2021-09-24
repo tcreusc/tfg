@@ -17,6 +17,7 @@ classdef TestSolver < handle
     end
     
     methods (Static)
+
         function test = create(testType, dataFile)
             run(dataFile)
             switch testType
@@ -27,8 +28,7 @@ classdef TestSolver < handle
                 otherwise
                     error('Invalid Test Type.')
             end
-            
         end
+
     end
-    
 end

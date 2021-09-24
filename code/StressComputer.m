@@ -12,10 +12,11 @@ classdef StressComputer < handle
     end
     
     methods(Access = public)
+
         function obj = StressComputer(cParams)
             obj.init(cParams);
         end
-        
+
         function obj = compute(obj)
             for iElem = 1:obj.dim.nel
                 bar = obj.createBar(iElem);
@@ -31,6 +32,7 @@ classdef StressComputer < handle
     end
     
     methods(Access = private)
+        
         function init(obj, cParams)
             obj.dim            = cParams.dim;
             obj.data           = cParams.data;
