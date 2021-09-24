@@ -14,11 +14,8 @@ classdef RotationMatrixComputer < handle
                 
         function obj = compute(obj)
             n = obj.bar;
-            le = n.le;
-            x1 = n.x1;
-            x2 = n.x2;
-            y1 = n.y1;
-            y2 = n.y2;
+            le = n.length;
+            [x1, y1, x2, y2] = n.getNodeCoordinates();
             coef = 1/le;
             Re = sparse(6,6);
             Re(1,1) =   coef * (x2-x1);

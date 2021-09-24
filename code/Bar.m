@@ -1,14 +1,15 @@
 classdef Bar < handle
     
     properties(SetAccess = private, GetAccess = public) % fer privat
-        x2, y2
-        E, A, Iz
-        le
-        RotationMatrix, KBase
+        length
     end
     
     properties(Access = private)
         data
+        x1, y1
+        x2, y2
+        E, A, Iz
+        RotationMatrix, KBase
     end
     
     methods(Access = public)
@@ -30,7 +31,7 @@ classdef Bar < handle
             obj.E  = Mat(Tm,1);
             obj.A  = Mat(Tm,2);
             obj.Iz = Mat(Tm,3);
-            obj.le  = obj.calculateBarLength();
+            obj.length  = obj.calculateBarLength();
         end
         
         function Re = calculateRotationMatrix(obj)
@@ -44,6 +45,20 @@ classdef Bar < handle
             ESC.compute();
             KB = ESC.KBase;
         end
+        
+        function [x1, y1, x2, y2] = getNodeCoordinates(obj)
+            x1 = obj.x1;
+            y1 = obj.y1;
+            x2 = obj.x2;
+            y2 = obj.y2;
+        end
+        
+        function [E, A, Iz] = getMaterialData(obj)
+            E = obj.E;
+            A = obj.A;
+            Iz = obj.Iz;
+        end
+
     end
 
     methods(Access = protected)

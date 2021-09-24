@@ -15,9 +15,10 @@ classdef ElementStiffnessComputer < handle
                 
         function obj = compute(obj)
             n  = obj.bar;
-            le = n.le;
-            c1 = n.Iz*n.E/le^3;
-            c2 = n.A*n.E/le;
+            le = n.length;
+            [E, A, Iz] = n.getMaterialData();
+            c1 = Iz*E/le^3;
+            c2 = A*E/le;
             K = sparse(6,6);
             K(1,1) = c2;
             K(1,4) = -c2;
