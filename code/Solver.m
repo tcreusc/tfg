@@ -1,5 +1,7 @@
 classdef (Abstract) Solver < handle
+    
     methods (Static)
+
         function stype = create(solver_type)    
             switch solver_type
                 case {'DIRECT'}
@@ -10,9 +12,11 @@ classdef (Abstract) Solver < handle
                     error('Invalid Solver Type.')
             end
         end
+
     end
     
-    methods (Access = protected, Abstract)
-%         solve
+    methods (Abstract, Access = public)
+        solve(RHS, LHS)
     end
+
 end
