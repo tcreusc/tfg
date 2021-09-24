@@ -10,7 +10,7 @@ classdef FEMTest < Test
             obj.initFile();
             [directRes, iterRes] = obj.computeResults();
             maxError = obj.checkMaxError(directRes, iterRes);
-            tolerance = 1e-10;
+            tolerance = 1e-4;
             if maxError < tolerance
                 passed = 1;
             else

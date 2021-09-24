@@ -1,4 +1,4 @@
-classdef DisplacementComputer < TestableObject
+classdef DisplacementComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
         displacement

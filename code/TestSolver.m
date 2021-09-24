@@ -17,10 +17,18 @@ classdef TestSolver < handle
     end
     
     methods (Static)
+        function test = create(testType, dataFile)
+            run(dataFile)
+            switch testType
+                case {'FEM'}
+                    test = FEMTest();
+                case {'STIFFNESS'}
+                    test = StiffnessTest();
+                otherwise
+                    error('Invalid Test Type.')
+            end
             
-    end
-    
-    methods(Access = private)
+        end
     end
     
 end

@@ -1,4 +1,4 @@
-classdef FEMAnalyzer < TestableObject
+classdef FEMAnalyzer < handle
     
     properties(SetAccess = private, GetAccess = public)
         displacement

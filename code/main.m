@@ -4,17 +4,10 @@ addpath Test
 
 clc; clear;
 
-% dataFile = 'dades.m';
-% test = TestSolver.create('FEM', dataFile);
-% test.compute();
-% test.check();
+file1 = 'dades_stiffness.m';
+test = TestSolver().create('STIFFNESS', file1);
+test.checkPassed(file1)
 
-test = StiffnessTest();
-test.checkPassed('dades_stiffness.m')
-
-test = FEMTest();
-test.checkPassed('dades.m')
-
-%%%
-% test = TestSolver('STIFFNESS');
-% eval StiffnessTest().checkPassed('dades_stiffness.m')
+file2 = 'dades.m';
+test2 = TestSolver().create('FEM', file2);
+test2.checkPassed(file2)

@@ -1,4 +1,4 @@
-classdef Bar < TestableObject
+classdef Bar < handle
     
     properties(SetAccess = private, GetAccess = public)
         x1, y1

@@ -1,4 +1,4 @@
-classdef StiffnessMatrixComputer < TestableObject
+classdef StiffnessMatrixComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
         KGlobal
