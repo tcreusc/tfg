@@ -67,12 +67,12 @@ classdef StressComputer < handle
     methods(Static)
         
         function [Fx, Fy, Mz] = assignForces(e, F)
-                Fx(e,1) = -F(1);
-                Fx(e,2) =  F(4);
-                Fy(e,1) = -F(2);
-                Fy(e,2) =  F(5);
-                Mz(e,1) = -F(3);
-                Mz(e,2) =  F(6);
+            Fx(e,1) = -F(1);
+            Fx(e,2) =  F(4);
+            Fy(e,1) = -F(2);
+            Fy(e,2) =  F(5);
+            Mz(e,1) = -F(3);
+            Mz(e,2) =  F(6);
         end
 
     end

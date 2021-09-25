@@ -6,9 +6,11 @@ classdef FEMAnalyzer < handle
     
     properties(Access = private)
         data
+        DOFManager
         solvertype
         connectivities
-        KElem, KGlobal, Fext
+        K, KElem, KGlobal
+        F, Fext
         Fx, Fy, Mz
         dim
     end
@@ -19,7 +21,7 @@ classdef FEMAnalyzer < handle
             obj.init(cParams);
         end
 
-        function obj = perform(obj)
+        function obj = perform(obj)     
             obj.computeConnectivities();
             obj.computeStiffnessMatrix();
             obj.computeForces();
@@ -41,8 +43,17 @@ classdef FEMAnalyzer < handle
             obj.data       = cParams.data;
             obj.dim        = cParams.dim;
             obj.solvertype = cParams.solvertype;
+            obj.createDOFManager();
         end
-                
+
+        function createDOFManager(obj)
+            s.dim         = obj.dim;
+            s.data.fixnod = obj.data.fixnod;
+            DOFfixer = DOFFixer(s);
+            DOFfixer.fix();
+            obj.DOFManager = DOFfixer;
+        end
+
         function computeConnectivities(obj)
             nel = obj.dim.nel;
             nne = obj.dim.nne;
@@ -63,27 +74,31 @@ classdef FEMAnalyzer < handle
         function computeStiffnessMatrix(obj)
             s.dim            = obj.dim;
             s.data           = obj.data;
+            s.DOFManager     = obj.DOFManager;
             s.connectivities = obj.connectivities;
             KComp = StiffnessMatrixComputer(s);
             KComp.compute();
             obj.KElem   = KComp.KElem;
             obj.KGlobal = KComp.KGlobal;
+            obj.K = KComp.calculateFreeStiffnessMatrix();
         end
         
         function computeForces(obj)
-            s.dim  = obj.dim;
-            s.data = obj.data;
+            s.dim        = obj.dim;
+            s.data       = obj.data;
+            s.KGlobal    = obj.KGlobal;
+            s.DOFManager = obj.DOFManager;
             FC = ForcesComputer(s);
             FC.compute();
             obj.Fext = FC.Fext;
+            obj.F = FC.F;
         end
         
         function computeDisplacements(obj)
-            s.dim        = obj.dim;
-            s.data       = obj.data;
-            s.Fext       = obj.Fext;
-            s.KGlobal    = obj.KGlobal;
+            s.K          = obj.K;
+            s.F          = obj.F;
             s.solvertype = obj.solvertype;
+            s.DOFManager = obj.DOFManager;
             DC = DisplacementComputer(s);
             DC.compute();
             obj.displacement = DC.displacement;
@@ -100,6 +115,7 @@ classdef FEMAnalyzer < handle
             obj.Fx = SC.Fx;
             obj.Fy = SC.Fy;
             obj.Mz = SC.Mz;
-        end 
+        end
+        
     end
 end
