@@ -1,5 +1,5 @@
 classdef Bar < handle
-    %provo
+
     properties(SetAccess = private, GetAccess = public) % fer privat
         length
     end
