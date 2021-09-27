@@ -18,7 +18,7 @@ classdef (Abstract) Test < handle
     end
     
     methods(Access = protected)
-         p = passed(obj)
+         passed(obj)
     end
     
     methods (Static, Access = private)

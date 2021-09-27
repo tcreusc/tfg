@@ -48,14 +48,6 @@ classdef StiffnessMatrixComputer < handle
             obj.connectivities = cParams.connectivities;
         end
 
-        function createDOFFixer(obj)
-            s.dim         = obj.dim;
-            s.data.fixnod = obj.data.fixnod;
-            DOFfixer = DOFFixer(s);
-            DOFfixer.fix();
-            obj.DOFManager = DOFfixer;
-        end
-
         function createElementStiffness(obj)
             nel = obj.dim.nel;
             nne = obj.dim.nne;
