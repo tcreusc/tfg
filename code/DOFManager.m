@@ -1,4 +1,4 @@
-classdef DOFFixer < handle
+classdef DOFManager < handle
 
     properties(SetAccess = private, GetAccess = public)
         fixedDisp
@@ -12,7 +12,7 @@ classdef DOFFixer < handle
     end
 
     methods(Access = public)
-        function obj = DOFFixer(cParams)
+        function obj = DOFManager(cParams)
             obj.init(cParams);
         end
 

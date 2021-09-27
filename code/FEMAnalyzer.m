@@ -49,9 +49,9 @@ classdef FEMAnalyzer < handle
         function createDOFManager(obj)
             s.dim         = obj.dim;
             s.data.fixnod = obj.data.fixnod;
-            DOFfixer = DOFFixer(s);
-            DOFfixer.fix();
-            obj.DOFManager = DOFfixer;
+            DOFMgr = DOFManager(s);
+            DOFMgr.fix();
+            obj.DOFManager = DOFMgr;
         end
 
         function computeConnectivities(obj)
