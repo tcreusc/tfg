@@ -8,14 +8,6 @@ classdef TestSolver < handle
         expectedResults
     end
     
-    methods(Access = public)
-        function obj = TestSolver()
-        end
-        
-        function check(obj, results)
-        end
-    end
-    
     methods (Static)
 
         function test = create(testType, dataFile)

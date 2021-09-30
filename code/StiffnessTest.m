@@ -30,7 +30,7 @@ classdef StiffnessTest < Test
             obj.dim            = dim;
             obj.data           = data;
             obj.KComp          = KComp;
-            obj.DOFManager     = DOFManager;
+            obj.DOFManager     = DOFMgr;
             obj.connectivities = connectivities;
         end
 

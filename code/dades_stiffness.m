@@ -126,5 +126,5 @@ load dades_stiffness.mat KComp;
 
 s.dim         = dim;
 s.data.fixnod = data.fixnod;
-DOFManager = DOFManager(s);
-DOFManager.fix();
+DOFMgr = DOFManager(s);
+DOFMgr.fix();
