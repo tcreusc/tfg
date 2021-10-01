@@ -1,6 +1,6 @@
 classdef Bar < handle
 
-    properties(SetAccess = private, GetAccess = public) % fer privat
+    properties(SetAccess = private, GetAccess = public)
         length
     end
     

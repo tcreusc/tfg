@@ -21,7 +21,7 @@ classdef FEMAnalyzer < handle
             obj.init(cParams);
         end
 
-        function obj = perform(obj)     
+        function obj = perform(obj)  
             obj.computeConnectivities();
             obj.computeStiffnessMatrix();
             obj.computeForces();
