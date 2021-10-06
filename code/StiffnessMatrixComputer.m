@@ -8,7 +8,6 @@ classdef StiffnessMatrixComputer < handle
     properties(Access = private)
         dim
         data
-        DOFManager
         connectivities
     end
 
@@ -27,16 +26,6 @@ classdef StiffnessMatrixComputer < handle
             obj.assembleGlobalMatrix();
         end
         
-        function KLL = calculateFreeStiffnessMatrix(obj)
-            freeDOFs = obj.DOFManager.freeDOFs;
-            KLL   = obj.KGlobal(freeDOFs, freeDOFs);
-        end
-        
-        function KRL = calculateFreeFixedStiffnessMatrix(obj)
-            freeDOFs = obj.DOFManager.freeDOFs;
-            KRL   = obj.KGlobal(freeDOFs, freeDOFs);
-        end
-        
     end
     
     methods(Access = private)
@@ -44,7 +33,6 @@ classdef StiffnessMatrixComputer < handle
         function init(obj, cParams)
             obj.dim            = cParams.dim;
             obj.data           = cParams.data;
-            obj.DOFManager     = cParams.DOFManager;
             obj.connectivities = cParams.connectivities;
         end
 

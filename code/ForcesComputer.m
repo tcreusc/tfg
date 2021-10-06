@@ -2,15 +2,11 @@ classdef ForcesComputer < handle
 
     properties(SetAccess = private, GetAccess = public)
         Fext
-        F
     end
     
     properties(Access = private)
         dim
-        data
         fdata
-        KGlobal
-        DOFManager
     end
     
     methods(Access = public)
@@ -21,7 +17,6 @@ classdef ForcesComputer < handle
 
         function obj = compute(obj)
             obj.calculateExternalForcesMatrix();
-            obj.calculateForceMatrix();
         end
         
     end
@@ -31,8 +26,6 @@ classdef ForcesComputer < handle
         function init(obj, cParams)
             obj.dim        = cParams.dim;
             obj.fdata      = cParams.data.fdata;
-            obj.KGlobal    = cParams.KGlobal;
-            obj.DOFManager = cParams.DOFManager;
         end
         
         function calculateExternalForcesMatrix(obj)
@@ -47,16 +40,6 @@ classdef ForcesComputer < handle
                forces(DOF,1) = val;
             end
             obj.Fext = forces;
-        end
-        
-        function calculateForceMatrix(obj) 
-            DOFMgr = obj.DOFManager;
-            freeDOFS  = DOFMgr.freeDOFs;
-            fixedDOFS = DOFMgr.fixedDOFs;
-            fixedDis  = DOFMgr.fixedDisp;
-            freeFixedK = obj.KGlobal(freeDOFS, fixedDOFS);
-            freeFext   = obj.Fext(freeDOFS,1);
-            obj.F = freeFext - freeFixedK*fixedDis;
         end
         
     end

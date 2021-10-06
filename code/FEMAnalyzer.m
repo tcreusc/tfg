@@ -6,13 +6,13 @@ classdef FEMAnalyzer < handle
     
     properties(Access = private)
         data
-        DOFManager
         solvertype
         connectivities
         K, KElem, KGlobal
         F, Fext
         Fx, Fy, Mz
         dim
+        boundaryConditions 
     end
     
     methods(Access = public)
@@ -25,6 +25,7 @@ classdef FEMAnalyzer < handle
             obj.computeConnectivities();
             obj.computeStiffnessMatrix();
             obj.computeForces();
+            obj.applyBoundaryConditions();
             obj.computeDisplacements();
             obj.computeStress();
         end  
@@ -43,15 +44,6 @@ classdef FEMAnalyzer < handle
             obj.data       = cParams.data;
             obj.dim        = cParams.dim;
             obj.solvertype = cParams.solvertype;
-            obj.createDOFManager();
-        end
-
-        function createDOFManager(obj)
-            s.dim         = obj.dim;
-            s.data.fixnod = obj.data.fixnod;
-            DOFMgr = DOFManager(s);
-            DOFMgr.fix();
-            obj.DOFManager = DOFMgr;
         end
 
         function computeConnectivities(obj)
@@ -74,31 +66,39 @@ classdef FEMAnalyzer < handle
         function computeStiffnessMatrix(obj)
             s.dim            = obj.dim;
             s.data           = obj.data;
-            s.DOFManager     = obj.DOFManager;
             s.connectivities = obj.connectivities;
             KComp = StiffnessMatrixComputer(s);
             KComp.compute();
             obj.KElem   = KComp.KElem;
             obj.KGlobal = KComp.KGlobal;
-            obj.K = KComp.calculateFreeStiffnessMatrix();
         end
         
         function computeForces(obj)
-            s.dim        = obj.dim;
-            s.data       = obj.data;
-            s.KGlobal    = obj.KGlobal;
-            s.DOFManager = obj.DOFManager;
+            s.dim  = obj.dim;
+            s.data = obj.data;
             FC = ForcesComputer(s);
             FC.compute();
             obj.Fext = FC.Fext;
-            obj.F = FC.F;
         end
-        
+
+        function applyBoundaryConditions(obj)
+            s.dim         = obj.dim;
+            s.Fext        = obj.Fext;
+            s.KGlobal     = obj.KGlobal;
+            s.data.fixnod = obj.data.fixnod;
+            BCA = BoundaryConditionsApplier(s);
+            obj.boundaryConditions.fixedDisp = BCA.fixedDisp;
+            obj.boundaryConditions.fixedDOFs = BCA.fixedDOFs;
+            obj.boundaryConditions.freeDOFs  = BCA.freeDOFs;
+            obj.K = BCA.calculateFreeStiffnessMatrix();
+            obj.F = BCA.calculateForceMatrix();
+        end
+
         function computeDisplacements(obj)
-            s.K          = obj.K;
-            s.F          = obj.F;
-            s.solvertype = obj.solvertype;
-            s.DOFManager = obj.DOFManager;
+            s.K                  = obj.K;
+            s.F                  = obj.F;
+            s.solvertype         = obj.solvertype;
+            s.boundaryConditions = obj.boundaryConditions;
             DC = DisplacementComputer(s);
             DC.compute();
             obj.displacement = DC.displacement;

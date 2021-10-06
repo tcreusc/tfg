@@ -5,7 +5,6 @@ classdef StiffnessTest < Test
         dim
         connectivities
         KComp
-        DOFManager
     end
     
     methods(Access = protected)
@@ -30,14 +29,12 @@ classdef StiffnessTest < Test
             obj.dim            = dim;
             obj.data           = data;
             obj.KComp          = KComp;
-            obj.DOFManager     = DOFMgr;
             obj.connectivities = connectivities;
         end
 
         function [Ke, Kg] = computeResults(obj)
             s.dim            = obj.dim;
             s.data           = obj.data;
-            s.DOFManager     = obj.DOFManager;
             s.connectivities = obj.connectivities;
             SMC = StiffnessMatrixComputer(s);
             SMC.compute();
