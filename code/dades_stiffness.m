@@ -123,8 +123,3 @@ connectivities = [1     2     3     4     5     6;
      7     8     9    13    14    15;];
  
 load dades_stiffness.mat KComp;
-
-s.dim         = dim;
-s.data.fixnod = data.fixnod;
-DOFManager = DOFFixer(s);
-DOFManager.fix();

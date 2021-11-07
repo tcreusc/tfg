@@ -1,4 +1,4 @@
-classdef DOFFixer < handle
+classdef BoundaryConditionsApplier < handle
 
     properties(SetAccess = private, GetAccess = public)
         fixedDisp
@@ -8,24 +8,46 @@ classdef DOFFixer < handle
 
     properties(Access = private)
         dim
+        Fext
         fixnod
+        KGlobal
     end
 
     methods(Access = public)
-        function obj = DOFFixer(cParams)
+        
+        function obj = BoundaryConditionsApplier(cParams)
             obj.init(cParams);
         end
 
         function obj = fix(obj)
-            obj.calculateFixedData();
-            obj.calculateFreeDOFs();
         end
+        
+        function KLL = calculateFreeStiffnessMatrix(obj)
+            freeDOF = obj.freeDOFs;
+            KG      = obj.KGlobal;
+            KLL     = KG(freeDOF, freeDOF);
+        end
+        
+        function F = calculateForceMatrix(obj)
+            KG   = obj.KGlobal;
+            Fex  = obj.Fext;
+            freeDOFS   = obj.freeDOFs;
+            fixedDis   = obj.fixedDisp;
+            freeFixedK = obj.calculateFreeFixedStiffnessMatrix(KG);
+            freeFext   = Fex(freeDOFS,1);
+            F = freeFext - freeFixedK * fixedDis;
+        end
+
     end
 
     methods(Access = private)
         function init(obj, cParams)
-            obj.dim    = cParams.dim;
-            obj.fixnod = cParams.data.fixnod;
+            obj.dim     = cParams.dim;
+            obj.Fext    = cParams.Fext;
+            obj.KGlobal = cParams.KGlobal;
+            obj.fixnod  = cParams.data.fixnod;
+            obj.calculateFixedData();
+            obj.calculateFreeDOFs();
         end
 
         function calculateFixedData(obj)
@@ -55,6 +77,13 @@ classdef DOFFixer < handle
                 end
             end
             obj.freeDOFs = vl;
-        end     
+        end
+        
+        function KRL = calculateFreeFixedStiffnessMatrix(obj, KG)
+            freeDOF = obj.freeDOFs;
+            fixedDOF = obj.fixedDOFs;
+            KRL   = KG(freeDOF, fixedDOF);
+        end
+        
     end
 end

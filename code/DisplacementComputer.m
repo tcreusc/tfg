@@ -7,7 +7,7 @@ classdef DisplacementComputer < handle
     properties(Access = private)
         F, K
         solvertype
-        DOFManager
+        boundaryConditions
     end
     
     methods(Access = public)
@@ -29,19 +29,19 @@ classdef DisplacementComputer < handle
             obj.K          = cParams.K;
             obj.F          = cParams.F;
             obj.solvertype = cParams.solvertype;
-            obj.DOFManager = cParams.DOFManager;
+            obj.boundaryConditions = cParams.boundaryConditions;
         end
 
         function calculateFreeDisplacement(obj)
-            freeDOFs = obj.DOFManager.freeDOFs;
+            freeDOFs = obj.boundaryConditions.freeDOFs;
             solver = Solver.create(obj.solvertype);
             solution = solver.solve(obj.K, obj.F);
             obj.displacement(freeDOFs,1) = solution;
         end
 
         function calculateFixedDisplacement(obj)
-            fixedDOFs = obj.DOFManager.fixedDOFs;
-            fixedDisp = obj.DOFManager.fixedDisp;
+            fixedDOFs = obj.boundaryConditions.fixedDOFs;
+            fixedDisp = obj.boundaryConditions.fixedDisp;
             obj.displacement(fixedDOFs,1) = fixedDisp;
         end
 

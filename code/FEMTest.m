@@ -34,44 +34,29 @@ classdef FEMTest < Test
         end
         
         function [dirRes, iterRes] = computeResults(obj)
-            dirRes  = obj.computeDirectResults();
-            iterRes = obj.computeIterativeResults();
+            dirRes  = obj.calculateProblemResults('DIRECT');
+            iterRes = obj.calculateProblemResults('ITERATIVE');
         end
     
-        function error = checkMaxError(obj, directRes, iterRes) % checkError separadet
-            dirErr  = obj.calculateDirectError(directRes);
-            iterErr = obj.calculateIterativeError(iterRes);
+        function error = checkMaxError(obj, directRes, iterRes)
+            dirErr  = obj.calculateError(directRes);
+            iterErr = obj.calculateError(iterRes);
             error = max(dirErr,iterErr);
         end
         
-        function results = computeDirectResults(obj)
+        function results = calculateProblemResults(obj, solvertype)
             s.dim        = obj.dim;
             s.data       = obj.data;
-            s.solvertype = 'DIRECT';
+            s.solvertype = solvertype;
             FEM = FEMAnalyzer(s);
             FEM.perform();
             results = FEM.displacement;
         end
         
-        function maxError = calculateDirectError(obj, directRes)
+        function maxError = calculateError(obj, computed)
             values = obj.results;
-            error = abs(directRes - values);
+            error = abs(computed - values);
             maxError = max(error);
-        end
-        
-        function results = computeIterativeResults(obj)
-            s.dim        = obj.dim;
-            s.data       = obj.data;
-            s.solvertype = 'ITERATIVE';
-            FEM = FEMAnalyzer(s);
-            FEM.perform();
-            results = FEM.displacement;
-        end
-        
-        function error = calculateIterativeError(obj, iterRes)
-            values = obj.results;
-            diff = abs(iterRes - values);
-            error = max(diff);
         end
 
     end
