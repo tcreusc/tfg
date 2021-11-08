@@ -21,7 +21,7 @@ g = 9.81;
 
 % Nodal coordinates matrix 
 %  x(a,j) = coordinate of node a in the dimension j
-data.x = [%X      Y      Z
+data.nodes = [%X      Y      Z
          2*W,  -W/2,     0; % (1)
          2*W,   W/2,     0; % (2)
          2*W,     0,     H; % (3)
@@ -33,7 +33,7 @@ data.x = [%X      Y      Z
 
 % Nodal connectivities  
 %  Tn(e,a) = global nodal number associated to node a of element e
-data.Tn = [%     a      b
+data.nodalconnec = [%     a      b
            1,     2; % (1)
            3,     7; % (2)
            7,     4; % (3)
@@ -59,7 +59,7 @@ data.Tn = [%     a      b
 %  mat(m,2) = Section area of material m
 %  mat(m,3) = Density of material m
 %  --more columns can be added for additional material properties--
-data.mat = [% Young M.        Section A.    Density   Mom. of inertia for buckling
+data.materials = [% Young M.        Section A.    Density   Mom. of inertia for buckling
             55e9, pi/4*(D1^2-d1^2),       2350,     min(I1);  % Material (1)
            147e9,        pi/4*D2^2,        950,     min(I2);% Material (2)
 ];
@@ -69,7 +69,7 @@ data.mat = [% Young M.        Section A.    Density   Mom. of inertia for buckli
 L = 1.4306e+03;
 T = 1.7510e+03;
 D = 1.7510e+03;
-data.Tmat = [% Mat. index
+data.matconnec = [% Mat. index
                    1; % (1)
                    1; % (2)
                    1; % (3)
@@ -117,10 +117,10 @@ data.fixnod = [
 
 %% Problem data
 % Dimensions
-dim.nd = size(data.x,2);   % Problem dimension
-dim.nel = size(data.Tn,1); % Number of elements (bars)
-dim.nnod = size(data.x,1); % Number of nodes (joints)
-dim.nne = size(data.Tn,2); % Number of nodes in a bar
+dim.nd = size(data.nodes,2);   % Problem dimension
+dim.nel = size(data.nodalconnec,1); % Number of elements (bars)
+dim.nnod = size(data.nodes,1); % Number of nodes (joints)
+dim.nne = size(data.nodalconnec,2); % Number of nodes in a bar
 dim.ni = 3;           % Degrees of freedom per node
 dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
 

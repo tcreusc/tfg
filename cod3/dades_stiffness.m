@@ -43,7 +43,7 @@ L4 = 2.5; % m
 L5 = 4.2; % m
 
 % Nodal coordinates
-data.x = [
+data.nodes = [
       0,          H1; % Node 1
       0,       H1+H2; % Node 2
       0,    H1+H2+H3; % Node 3
@@ -52,7 +52,7 @@ data.x = [
 ];
 
 % Nodal connectivities  
-data.Tn = [
+data.nodalconnec = [
     1, 2; % Element 1-2
     2, 3; % Element 2-3
     3, 4; % Element 3-4
@@ -60,13 +60,13 @@ data.Tn = [
 ];
 
 % Material properties matrix
-data.mat = [
+data.materials = [
                E,               AA,        IzA;  % Material 1
                E,               AB,        IzB;  % Material 2
 ];
 
 % Material connectivities
-data.Tmat = [
+data.matconnec = [
     1; % Element 1-2 / Material 1 (A)
     1; % Element 2-3 / Material 1 (A)
     1; % Element 3-4 / Material 1 (A)
@@ -103,10 +103,10 @@ data.fixnod = [
 
 %% Problem data
 % Dimensions
-dim.nd = size(data.x,2);   % Problem dimension
-dim.nel = size(data.Tn,1); % Number of elements (bars)
-dim.nnod = size(data.x,1); % Number of nodes (joints)
-dim.nne = size(data.Tn,2); % Number of nodes in a bar
+dim.nd = size(data.nodes,2);   % Problem dimension
+dim.nel = size(data.nodalconnec,1); % Number of elements (bars)
+dim.nnod = size(data.nodes,1); % Number of nodes (joints)
+dim.nne = size(data.nodalconnec,2); % Number of nodes in a bar
 dim.ni = 3;           % Degrees of freedom per node
 dim.ndof = dim.nnod*dim.ni;  % Total number of degrees of freedom
 

@@ -62,7 +62,7 @@ classdef Mesh < handle
                 for i = 1:nne
                     for j = 1:ni
                         I = ni*(i-1)+j;
-                        Tn = obj.data.Tn(e,i);
+                        Tn = obj.data.nodalconnec(e,i);
                         T(e,I) = ni*(Tn-1)+j;
                     end
                 end

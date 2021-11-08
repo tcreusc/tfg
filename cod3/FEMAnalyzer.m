@@ -2,6 +2,7 @@ classdef FEMAnalyzer < handle
     
     properties(SetAccess = private, GetAccess = public)
         displacement
+        stress
     end
     
     properties(Access = private)
@@ -11,7 +12,6 @@ classdef FEMAnalyzer < handle
         connectivities
         K, KElem, KGlobal
         F, Fext
-        stress
         dim
         mesh
     end

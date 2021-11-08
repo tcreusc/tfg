@@ -17,13 +17,13 @@ S = [ones(11,1); 2*ones(6,1)];
 
 function [displ, stress] = calculateResults(zeds, sects, filename)
     run(filename)
-    data.Tmat = sects;
-    data.x(:,3) = zeds;
+    data.matconnec = sects;
+    data.nodes(:,3) = zeds;
     s.dim        = dim;
     s.data       = data;
     s.solvertype = 'DIRECT'; % ITERATIVE
     FEM = FEMAnalyzer(s);
     FEM.perform();
     displ = FEM.displacement;
-    stress = true;
+    stress = FEM.stress;
 end

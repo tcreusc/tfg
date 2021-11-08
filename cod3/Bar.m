@@ -19,11 +19,11 @@ classdef Bar < handle
         end
         
         function obj = create(obj, e)
-            X    = obj.data.x;
-            nod1 = obj.data.Tn(e,1);
-            nod2 = obj.data.Tn(e,2);
-            Mat  = obj.data.mat;
-            Tm   = obj.data.Tmat(e);
+            X    = obj.data.nodes;
+            nod1 = obj.data.nodalconnec(e,1);
+            nod2 = obj.data.nodalconnec(e,2);
+            Mat  = obj.data.materials;
+            Tm   = obj.data.matconnec(e);
             obj.x1 = X(nod1, 1);
             obj.x2 = X(nod2, 1);
             obj.y1 = X(nod1, 2);
