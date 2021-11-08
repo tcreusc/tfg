@@ -13,6 +13,7 @@ classdef FEMAnalyzer < handle
         F, Fext
         stress
         dim
+        mesh
     end
     
     methods(Access = public)
@@ -22,7 +23,7 @@ classdef FEMAnalyzer < handle
         end
 
         function obj = perform(obj)
-            obj.computeConnectivities();
+            obj.createMesh();
             obj.computeStiffnessMatrix();
             obj.computeForces();
             obj.computeDisplacements();
@@ -52,6 +53,13 @@ classdef FEMAnalyzer < handle
             DOFfixer = DOFFixer(s);
             DOFfixer.fix();
             obj.DOFManager = DOFfixer;
+        end
+
+        function createMesh(obj)
+            s.dim = obj.dim;
+            s.data = obj.data;
+            obj.mesh = Mesh(s);
+            obj.connectivities = obj.mesh.connectivities;
         end
 
         function computeConnectivities(obj)

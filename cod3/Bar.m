@@ -34,12 +34,19 @@ classdef Bar < handle
             obj.A  = Mat(Tm,2);
             obj.Iz = Mat(Tm,3);
             obj.length  = obj.calculateBarLength();
+            obj.RotationMatrix = obj.calculateRotationMatrix();
+            obj.KBase = obj.calculateEuclideanStiffnessMatrix();
+        end
+        
+        function Re = getRotationMatrix(obj)
+            Re = obj.RotationMatrix;
         end
         
         function Re = calculateRotationMatrix(obj)
             RM = RotationMatrixComputer(obj);
             RM.compute();
             Re = RM.RotationMatrix;
+            obj.RotationMatrix = Re;
         end
         
         function KB = calculateEuclideanStiffnessMatrix(obj)
@@ -86,4 +93,3 @@ classdef Bar < handle
         
     end
 end
-
