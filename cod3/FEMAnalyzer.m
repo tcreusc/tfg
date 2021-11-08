@@ -61,23 +61,6 @@ classdef FEMAnalyzer < handle
             obj.mesh = Mesh(s);
             obj.connectivities = obj.mesh.connectivities;
         end
-
-        function computeConnectivities(obj)
-            nel = obj.dim.nel;
-            nne = obj.dim.nne;
-            ni  = obj.dim.ni;
-            T = zeros(nel,nne*ni);
-            for e = 1:nel
-                for i = 1:nne
-                    for j = 1:ni
-                        I = ni*(i-1)+j;
-                        Tn = obj.data.Tn(e,i);
-                        T(e,I) = ni*(Tn-1)+j;
-                    end
-                end
-            end
-            obj.connectivities = T;
-        end
         
         function computeStiffnessMatrix(obj)
             s.dim            = obj.dim;
