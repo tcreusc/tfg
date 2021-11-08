@@ -21,7 +21,7 @@ g = 9.81;
 
 % Nodal coordinates matrix 
 %  x(a,j) = coordinate of node a in the dimension j
-data.x = [%     X      Y      Z
+data.x = [%X      Y      Z
          2*W,  -W/2,     0; % (1)
          2*W,   W/2,     0; % (2)
          2*W,     0,     H; % (3)

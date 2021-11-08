@@ -9,7 +9,7 @@ classdef Bar < handle
         x1, y1, z1
         x2, y2, z2
         E, A, Iz
-        RotationMatrix, KBase
+        RotationMatrix, KBase, KElem
     end
     
     methods(Access = public)
@@ -36,10 +36,15 @@ classdef Bar < handle
             obj.length  = obj.calculateBarLength();
             obj.RotationMatrix = obj.calculateRotationMatrix();
             obj.KBase = obj.calculateEuclideanStiffnessMatrix();
+            obj.KElem = obj.rotateStiffnessMatrix();
         end
         
         function Re = getRotationMatrix(obj)
             Re = obj.RotationMatrix;
+        end
+        
+        function Ke = getElementStiffnessMatrix(obj)
+            Ke = obj.KElem;
         end
         
         function Re = calculateRotationMatrix(obj)
@@ -66,8 +71,12 @@ classdef Bar < handle
         
         function [E, A, Iz] = getMaterialData(obj)
             E = obj.E;
-            A = obj.A;
+            A = obj.getSection();
             Iz = obj.Iz;
+        end
+        
+        function A = getSection(obj)
+            A = obj.A;
         end
 
     end
@@ -89,6 +98,12 @@ classdef Bar < handle
             Y2 = obj.y2;
             Z2 = obj.z2;
             le = sqrt((X2 - X1)^2 + (Y2 - Y1)^2 + (Z2 - Z1)^2);
+        end
+        
+        function Ke = rotateStiffnessMatrix(obj)
+            R = obj.RotationMatrix;
+            K = obj.KBase;
+            Ke = transpose(R) * K * R;
         end
         
     end

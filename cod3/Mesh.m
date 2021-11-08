@@ -3,6 +3,7 @@ classdef Mesh < handle
     properties (Access = public)
         bars
         connectivities
+        mass
     end
 
     properties (Access = private)
@@ -16,6 +17,19 @@ classdef Mesh < handle
             obj.init(cParams);
         end
 
+        function calculateMass(obj)
+            nel = obj.dim.nel;
+            m = 0;
+            for iElem = 1:nel
+                bar = obj.bars(iElem);
+                len = bar.length;
+                sec = bar.getSection();
+                rho = 3;
+                m = m + rho * len * sec;
+            end
+            obj.mass = m;
+        end
+
     end
     
     methods (Access = private)
@@ -25,11 +39,12 @@ classdef Mesh < handle
             obj.data = cParams.data;
             obj.createBars();
             obj.computeConnectivities();
+            obj.calculateMass();
         end
         
         function createBars(obj)
             nel = obj.dim.nel;
-            for iElem = 1:obj.dim.nel
+            for iElem = 1:nel
                 s.data = obj.data;
                 bar = Bar(s);
                 bar.create(iElem);

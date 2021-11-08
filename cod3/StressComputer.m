@@ -9,6 +9,7 @@ classdef StressComputer < handle
         displacement
         connectivities
         KElem
+        mesh
     end
     
     methods(Access = public)
@@ -19,9 +20,10 @@ classdef StressComputer < handle
 
         function obj = compute(obj)
             str = zeros(obj.dim.nel, 1);
+            bars = obj.mesh.bars;
             for iElem = 1:obj.dim.nel
-                bar = obj.createBar(iElem);
-                Re = bar.calculateRotationMatrix();
+                bar = bars(iElem);
+                Re = bar.getRotationMatrix();
                 ue = obj.calculateElementDisplacement(iElem);
                 strainE = obj.calculateElementStrain(bar, Re, ue);
                 str(iElem, 1) = obj.calculateElementStress(bar, strainE);
@@ -35,15 +37,10 @@ classdef StressComputer < handle
         function init(obj, cParams)
             obj.dim            = cParams.dim;
             obj.data           = cParams.data;
-            obj.KElem          = cParams.KElem;  
+            obj.mesh           = cParams.mesh;
+            obj.KElem          = cParams.KElem;
             obj.displacement   = cParams.displacement;
             obj.connectivities = cParams.connectivities;
-        end
-        
-        function bar = createBar(obj, e)
-            s.data = obj.data;
-            bar = Bar(s);
-            bar.create(e);
         end
         
         function uelem = calculateElementDisplacement(obj, iElem)

@@ -67,6 +67,7 @@ classdef FEMAnalyzer < handle
             s.data           = obj.data;
             s.DOFManager     = obj.DOFManager;
             s.connectivities = obj.connectivities;
+            s.mesh           = obj.mesh;
             KComp = StiffnessMatrixComputer(s);
             KComp.compute();
             obj.KElem   = KComp.KElem;
@@ -98,6 +99,7 @@ classdef FEMAnalyzer < handle
         function computeStress(obj)
             s.dim            = obj.dim;
             s.data           = obj.data;
+            s.mesh           = obj.mesh;
             s.displacement   = obj.displacement;
             s.connectivities = obj.connectivities;
             s.KElem = obj.KElem;

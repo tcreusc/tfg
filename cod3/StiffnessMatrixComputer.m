@@ -10,6 +10,7 @@ classdef StiffnessMatrixComputer < handle
         data
         DOFManager
         connectivities
+        mesh
     end
 
     methods(Access = public)
@@ -46,6 +47,7 @@ classdef StiffnessMatrixComputer < handle
             obj.data           = cParams.data;
             obj.DOFManager     = cParams.DOFManager;
             obj.connectivities = cParams.connectivities;
+            obj.mesh           = cParams.mesh;
         end
 
         function createDOFFixer(obj)
@@ -61,11 +63,10 @@ classdef StiffnessMatrixComputer < handle
             nne = obj.dim.nne;
             ni  = obj.dim.ni;
             Kelem = zeros(nne*ni,nne*ni,nel);
+            bars = obj.mesh.bars;
             for iElem = 1:nel
-                bar   = obj.createBar(iElem);
-                Re    = bar.calculateRotationMatrix();
-                KBase = bar.calculateEuclideanStiffnessMatrix();
-                Ke    = obj.rotateStiffnessMatrix(KBase, Re);
+                bar   = bars(iElem);
+                Ke    = bar.getElementStiffnessMatrix();
                 Kelem(:,:,iElem) = Ke;
             end
             obj.KElem = Kelem;
@@ -90,18 +91,6 @@ classdef StiffnessMatrixComputer < handle
             obj.KGlobal = Kg;
         end
 
-        function bar = createBar(obj, e)
-            s.data = obj.data;
-            bar = Bar(s);
-            bar.create(e);
-        end
     end
 
-    methods(Static)
-
-        function Ke = rotateStiffnessMatrix(K, R)
-            Ke = transpose(R) * K * R;
-        end
-
-    end
 end
